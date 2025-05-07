@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { PDFDocument, rgb } from "pdf-lib"; // Usamos pdf-lib para manipular el PDF
 import { listTemplates, downloadFile } from "../services/one-drive.service"; // Asumiendo que las funciones están en un servicio separado
+import { Sidebar } from "lucide-react";
 
 const Templates = () => {
   const [templates, setTemplates] = useState<any[]>([]);
@@ -59,7 +60,8 @@ const Templates = () => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
+      <Sidebar />
       <h1>Seleccionar Plantilla</h1>
       <div>
         {templates.length > 0 ? (
