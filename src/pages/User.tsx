@@ -41,21 +41,67 @@ const User = () => {
     password: ''
   });
 
-  // Check viewport width and set view mode
   useEffect(() => {
-    const checkViewport = () => {
+    let animationFrameId: number;
+    let resizeObserver: ResizeObserver | null = null;
+  
+    const checkTableFit = () => {
       const tableContainer = document.getElementById('table-container');
-      if (tableContainer) {
-        const containerWidth = tableContainer.clientWidth;
-        setUseCardView(containerWidth < 1024);
-      }
+      const tableElement = tableContainer?.querySelector('table');
+      
+      if (!tableContainer || !tableElement) return;
+  
+      // Medimos tanto el contenedor como la tabla real
+      const containerWidth = tableContainer.clientWidth;
+      const tableWidth = tableElement.scrollWidth; // Ancho total incluyendo lo no visible
+      
+      // Determinamos si necesita scroll horizontal
+      const needsHorizontalScroll = tableWidth > containerWidth;
+      
+      setUseCardView(needsHorizontalScroll);
     };
-
-    checkViewport();
-    window.addEventListener('resize', checkViewport);
-    return () => window.removeEventListener('resize', checkViewport);
+  
+    // Usamos ResizeObserver para detectar cambios en la tabla
+    if ('ResizeObserver' in window) {
+      const tableElement = document.getElementById('table-container')?.querySelector('table');
+      if (tableElement) {
+        resizeObserver = new ResizeObserver(() => {
+          cancelAnimationFrame(animationFrameId);
+          animationFrameId = requestAnimationFrame(checkTableFit);
+        });
+        resizeObserver.observe(tableElement);
+      }
+    }
+  
+    // También observamos cambios en el contenedor
+    const containerObserver = new ResizeObserver(() => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(checkTableFit);
+    });
+  
+    const tableContainer = document.getElementById('table-container');
+    if (tableContainer) {
+      containerObserver.observe(tableContainer);
+    }
+  
+    // Listener de resize como fallback
+    const handleResize = () => {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = requestAnimationFrame(checkTableFit);
+    };
+  
+    window.addEventListener('resize', handleResize);
+  
+    // Verificación inicial con pequeño delay
+    setTimeout(checkTableFit, 50);
+  
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', handleResize);
+      resizeObserver?.disconnect();
+      containerObserver.disconnect();
+    };
   }, []);
-
   // Fetch users on mount
   useEffect(() => {
     const fetchUsers = async () => {
@@ -143,7 +189,7 @@ const User = () => {
   return (
     <div className="flex min-h-screen bg-gray-50">
       {/* Sidebar - Hidden on mobile */}
-      <div className="hidden md:block md:w-64 flex-shrink-0">
+      <div className="md:block md:w-64 flex-shrink-0">
         <Sidebar />
       </div>
 
