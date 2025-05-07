@@ -1,7 +1,10 @@
+// pages/User.tsx
+
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import Sidebar from "../components/Sidebar";
 import { getAllUsers, createUser, updateUser, deleteUser } from "../services/user.service";
+import UserList from "../components/UserList";
 
 const User = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,7 +49,6 @@ const User = () => {
             await createUser(formData);
             setModalOpen(false);
             setFormData({ username: "", name: "", position: "", department: "", password: "" });
-            // Refrescar la lista de usuarios
             const data = await getAllUsers();
             setUsers(data);
         } catch (err: any) {
@@ -71,7 +73,6 @@ const User = () => {
             await updateUser(formData);
             setModalOpen(false);
             setFormData({ username: "", name: "", position: "", department: "", password: "" });
-            // Refrescar la lista de usuarios
             const data = await getAllUsers();
             setUsers(data);
         } catch (err: any) {
@@ -82,19 +83,12 @@ const User = () => {
     const handleDeleteUser = async (username: string) => {
         try {
             await deleteUser(username);
-            // Refrescar la lista de usuarios
             const data = await getAllUsers();
             setUsers(data);
         } catch (err: any) {
             setError(err.message || "Error al eliminar el usuario.");
         }
     };
-
-    const filteredUsers = users.filter(
-        (user: any) =>
-            user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.username.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     return (
         <div className="flex min-h-screen bg-gray-100">
@@ -128,51 +122,12 @@ const User = () => {
                 ) : error ? (
                     <p className="text-red-500">{error}</p>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left border border-gray-200 rounded-lg overflow-hidden shadow-sm bg-white">
-                            <thead className="bg-gray-100">
-                                <tr>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Nombre</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Usuario</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Rol</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Dependencia</th>
-                                    <th className="px-4 py-3 text-sm font-medium text-gray-700 text-center">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredUsers.length > 0 ? (
-                                    filteredUsers.map((user: any) => (
-                                        <tr key={user.username} className="border-t border-gray-200 hover:bg-gray-50">
-                                            <td className="px-4 py-3">{user.name}</td>
-                                            <td className="px-4 py-3">{user.username}</td>
-                                            <td className="px-4 py-3">{user.position}</td>
-                                            <td className="px-4 py-3">{user.department}</td>
-                                            <td className="px-4 py-3 flex justify-center space-x-2">
-                                                <button
-                                                    className="text-blue-600 hover:text-blue-800"
-                                                    onClick={() => handleEditUser(user)}
-                                                >
-                                                    <Pencil size={18} />
-                                                </button>
-                                                <button
-                                                    className="text-red-600 hover:text-red-800"
-                                                    onClick={() => handleDeleteUser(user.username)}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
-                                    <tr>
-                                        <td colSpan={5} className="px-4 py-6 text-center text-gray-500">
-                                            No se encontraron usuarios.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                    <UserList
+                        users={users}
+                        onEdit={handleEditUser}
+                        onDelete={handleDeleteUser}
+                        searchTerm={searchTerm}
+                    />
                 )}
             </div>
 
