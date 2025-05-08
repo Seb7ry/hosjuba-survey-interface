@@ -25,7 +25,6 @@ const Sidebar = () => {
   const menuItems = [
     { label: "Inicio", icon: <Home size={20} />, path: "/dashboard" },
     { label: "Usuarios", icon: <User size={20} />, path: "/user" },
-    { label: "Plantillas", icon: <FileText size={20} />, path: "/template" },
     { label: "Casos", icon: <ClipboardList size={20} />, path: "/cases" },
     { label: "Reportes", icon: <BarChart2 size={20} />, path: "/reports" },
     { label: "Historial", icon: <BookOpen size={20} />, path: "/history" },

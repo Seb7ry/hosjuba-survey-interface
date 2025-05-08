@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
 type SignaturePadModalProps = {
@@ -12,7 +12,35 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
   const [isDrawing, setIsDrawing] = useState(false);
   const [signatureData, setSignatureData] = useState<string | null>(null);
 
-  if (!isOpen) return null;
+  // Configurar el canvas cuando se monta o cambia el tamaño
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    // Ajustar el tamaño real del canvas al tamaño de visualización
+    const resizeCanvas = () => {
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+
+      // Configurar el estilo del lápiz
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.strokeStyle = 'black';
+    };
+
+    resizeCanvas();
+
+    // Opcional: manejar redimensionamiento de ventana
+    window.addEventListener('resize', resizeCanvas);
+    return () => window.removeEventListener('resize', resizeCanvas);
+  }, [isOpen]);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -22,18 +50,18 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
     if (!ctx) return;
 
     setIsDrawing(true);
-    ctx.beginPath();
-    
+
     const rect = canvas.getBoundingClientRect();
     const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
     const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-    
+
+    ctx.beginPath();
     ctx.moveTo(x, y);
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
     if (!isDrawing) return;
-    
+
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -43,13 +71,19 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
     const rect = canvas.getBoundingClientRect();
     const x = 'touches' in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
     const y = 'touches' in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
-    
+
     ctx.lineTo(x, y);
     ctx.stroke();
   };
 
   const endDrawing = () => {
     setIsDrawing(false);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Guardar el estado actual del canvas como datos de firma
+    const dataUrl = canvas.toDataURL('image/png');
+    setSignatureData(dataUrl);
   };
 
   const clearCanvas = () => {
@@ -64,14 +98,12 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
   };
 
   const saveSignature = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const dataUrl = canvas.toDataURL('image/png');
-    setSignatureData(dataUrl);
-    onSave(dataUrl);
+    if (!signatureData) return;
+    onSave(signatureData);
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
@@ -87,8 +119,6 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
           <div className="border-2 border-dashed border-gray-300 rounded-lg">
             <canvas
               ref={canvasRef}
-              width={600}
-              height={300}
               className="w-full h-64 touch-none bg-white"
               onMouseDown={startDrawing}
               onMouseMove={draw}
@@ -132,4 +162,4 @@ const SignaturePadModal = ({ isOpen, onClose, onSave }: SignaturePadModalProps) 
   );
 };
 
-export default SignaturePadModal;
+export default SignaturePadModal; 

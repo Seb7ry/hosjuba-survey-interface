@@ -16,7 +16,7 @@ const headers = () => ({
 
 export type UserData = {
   username: string;
-  password: string;
+  password: string; // Hacer obligatorio para creación
   name: string;
   department: string;
   position: string;
@@ -34,7 +34,14 @@ export const getAllUsers = async (): Promise<UserData[]> => {
 
 export const createUser = async (userData: UserData): Promise<UserData> => {
   try {
-    const response = await axios.post(`${API_URL}/user`, userData, headers());
+    const response = await axios.post(`${API_URL}/user`, {
+      username: userData.username,
+      password: userData.password,
+      name: userData.name,
+      department: userData.department,
+      position: userData.position,
+      signature: userData.signature
+    }, headers());
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al crear el usuario.');
@@ -43,7 +50,14 @@ export const createUser = async (userData: UserData): Promise<UserData> => {
 
 export const updateUser = async (userData: UserData): Promise<UserData> => {
   try {
-    const response = await axios.put(`${API_URL}/user`, userData, headers());
+    const response = await axios.put(`${API_URL}/user`, {
+      username: userData.username,
+      ...(userData.password && { password: userData.password }), // Solo envía password si existe
+      name: userData.name,
+      department: userData.department,
+      position: userData.position,
+      signature: userData.signature
+    }, headers());
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al actualizar el usuario.');
