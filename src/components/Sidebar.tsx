@@ -4,7 +4,6 @@ import {
   X,
   LogOut,
   Home,
-  FileText,
   User,
   ClipboardList,
   BookOpen,
@@ -25,8 +24,8 @@ const Sidebar = () => {
   const menuItems = [
     { label: "Inicio", icon: <Home size={20} />, path: "/dashboard" },
     { label: "Usuarios", icon: <User size={20} />, path: "/user" },
-    { label: "Casos", icon: <ClipboardList size={20} />, path: "/cases" },
-    { label: "Reportes", icon: <BarChart2 size={20} />, path: "/reports" },
+    { label: "Casos", icon: <ClipboardList size={20} />, path: "/case" },
+    { label: "Reportes", icon: <BarChart2 size={20} />, path: "/report" },
     { label: "Historial", icon: <BookOpen size={20} />, path: "/history" },
   ];
 
@@ -80,18 +79,16 @@ const Sidebar = () => {
                       navigate(item.path);
                       setOpen(false);
                     }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 group ${
-                      location.pathname === item.path
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 group ${location.pathname === item.path
                         ? "bg-blue-100 text-blue-700"
                         : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`transition-colors duration-200 ${
-                        location.pathname === item.path
+                      className={`transition-colors duration-200 ${location.pathname === item.path
                           ? "text-blue-700"
                           : "text-gray-500 group-hover:text-blue-600"
-                      }`}
+                        }`}
                     >
                       {item.icon}
                     </span>

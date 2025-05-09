@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshSession } from './session.service';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,7 +17,7 @@ const headers = () => ({
 
 export type UserData = {
   username: string;
-  password: string; // Hacer obligatorio para creación
+  password: string;
   name: string;
   department: string;
   position: string;
@@ -26,6 +27,7 @@ export type UserData = {
 export const getAllUsers = async (): Promise<UserData[]> => {
   try {
     const response = await axios.get(`${API_URL}/user`, headers());
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al obtener usuarios.');
@@ -52,12 +54,15 @@ export const updateUser = async (userData: UserData): Promise<UserData> => {
   try {
     const response = await axios.put(`${API_URL}/user`, {
       username: userData.username,
-      ...(userData.password && { password: userData.password }), // Solo envía password si existe
+      ...(userData.password && { password: userData.password }),
       name: userData.name,
       department: userData.department,
       position: userData.position,
       signature: userData.signature
     }, headers());
+    sessionStorage.setItem('name', response.data.name);
+    sessionStorage.setItem('department', response.data.department);
+    sessionStorage.setItem('position', response.data.position);
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al actualizar el usuario.');

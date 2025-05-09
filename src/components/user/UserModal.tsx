@@ -45,6 +45,7 @@ const UserModal = ({
   const [positionModalMode, setPositionModalMode] = useState<'add' | 'edit'>('add');
   const [currentDepartment, setCurrentDepartment] = useState('');
   const [currentPosition, setCurrentPosition] = useState('');
+
   const [newDepartmentName, setNewDepartmentName] = useState('');
   const [newPositionName, setNewPositionName] = useState('');
   const [loadingDepartments, setLoadingDepartments] = useState(true);

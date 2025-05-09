@@ -44,7 +44,7 @@ export const Selector = ({
           ))
         )}
       </select>
-      
+
       <div className="flex gap-2 sm:flex-nowrap flex-wrap">
         <button
           type="button"
@@ -54,7 +54,7 @@ export const Selector = ({
         >
           <Plus className="h-4 w-4" />
         </button>
-        
+
         {value && (
           <>
             <button
