@@ -18,10 +18,14 @@ export const refreshSession = async (username: string) => {
     try {
         if (!username) throw new Error('Username es requerido.');
 
-        const response = await axios.post(`${API_URL}/session`,
+        const response = await axios.post(`${API_URL}/session`, 
             { username }, headers());
 
-        if (response.data) sessionStorage.setItem('expiredDateAt', response.data.expiredDateAt);
+        if (response.data) {
+            // Guardamos tanto el nuevo token como la fecha de expiración
+            sessionStorage.setItem('access_token', response.data.accessToken);
+            sessionStorage.setItem('expiredDateAt', response.data.session.expiredDateAt);
+        }
 
         return response.data;
     } catch (error: any) {

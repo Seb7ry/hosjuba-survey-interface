@@ -16,6 +16,15 @@ type User = {
   signature?: string;
 };
 
+type FormData = {
+  username: string;
+  name: string;
+  position: string;
+  department: string;
+  password?: string;
+  signature?: string;
+};
+
 const User = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,7 +35,7 @@ const User = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
-  const [formData, setFormData] = useState<UserData>({
+  const [formData, setFormData] = useState<FormData>({
     username: '',
     name: '',
     position: '',
@@ -82,18 +91,26 @@ const User = () => {
     setModalOpen(false);
   };
 
-  const handleSubmit = async (userData: UserData) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
+      const userData: UserData = {
+        ...formData,
+        password: formData.password || '' // Asegurar que password no sea undefined
+      };
+
       if (isEditing) {
         await updateUser(userData);
       } else {
+        if (!formData.password) {
+          throw new Error('La contraseña es requerida para nuevos usuarios');
+        }
         await createUser(userData);
       }
       const data = await getAllUsers();
       setUsers(data);
       resetForm();
     } catch (err: any) {
-      throw err; // El error será manejado por UserModal
+      throw err;
     }
   };
 
@@ -146,7 +163,7 @@ const User = () => {
 
         <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-            <h1 className="text-2xl font-semibold text-gray-800">Gestión de Usuarios</h1>
+            <h1 className="text-3xl font-semibold text-gray-800">Gestión de Usuarios</h1>
             <button
               onClick={() => setModalOpen(true)}
               className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
