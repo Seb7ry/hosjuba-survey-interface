@@ -7,8 +7,8 @@ import User from "./pages/User";
 import Case from "./pages/Case";
 import SessionMonitor from "./components/session/SessionMonitor";
 import Modal from 'react-modal';
+import Corrective from "./components/case/Corrective";
 
-// Configuración inicial del modal para react-modal
 if (typeof window !== 'undefined' && document.getElementById('root')) {
   Modal.setAppElement('#root');
 } else if (typeof window !== 'undefined') {
@@ -20,7 +20,6 @@ function App() {
   const accessToken = sessionStorage.getItem("access_token");
 
   useEffect(() => {
-    // Redirige al dashboard si ya está autenticado y en la raíz
     if (accessToken && window.location.pathname === "/") {
       navigate("/dashboard"); 
     }
@@ -34,6 +33,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard/>} />
           <Route path="/user" element={<User/>} />
           <Route path="/case" element={<Case/>} />
+          <Route path="/corrective" element={<Corrective/>} />
         </Route>
       </Routes>
       

@@ -18,9 +18,9 @@ const SessionMonitor = () => {
   const checkIntervalRef = useRef<number | null>(null);
   const lastTokenIdRef = useRef<string | null>(null);
 
-  const WARNING_THRESHOLD = 30 * 1000; // 30 segundos
-  const CHECK_INTERVAL = 1000; // 1 segundo
-  const SAFETY_MARGIN = 5000; // 5 segundos de margen de seguridad
+  const WARNING_THRESHOLD = (parseInt(import.meta.env.VITE_WARNING_THRESHOLD_SECONDS || "30", 10)) * 1000;
+  const CHECK_INTERVAL = 1000; 
+  const SAFETY_MARGIN = 5000; 
 
   const getSessionData = () => {
     return {
@@ -76,8 +76,7 @@ const SessionMonitor = () => {
 
     const { expirationTime: jwtExpiration, tokenId, username } = getTokenInfo(token);
     const backendExpiration = expiredAt ? new Date(expiredAt).getTime() : null;
-    
-    // Usamos el que expire primero entre JWT y MongoDB
+
     const effectiveExpiration = backendExpiration && jwtExpiration
       ? Math.min(jwtExpiration, backendExpiration)
       : jwtExpiration || backendExpiration;
@@ -102,41 +101,14 @@ const SessionMonitor = () => {
       markWarningAsShown(tokenId);
     }
   };
-
   const formatTime = (ms: number) => {
     const seconds = Math.max(Math.floor(ms / 1000), 0);
     return `${seconds} segundos`;
   };
 
-  const handleExtendSession = async () => {
-  const currentUsername = sessionStorage.getItem("username");
-  if (currentUsername) {
-    try {
-      const result = await refreshSession(currentUsername);
-      if (result) {
-        // Obtenemos la información del token decodificado
-        const tokenInfo = getTokenInfo(result.accessToken);
-        
-        // Actualizamos los datos del usuario en sessionStorage
-        if (tokenInfo.userData) {
-          const { name, position, department } = tokenInfo.userData;
-          if (name) sessionStorage.setItem("name", name);
-          if (position) sessionStorage.setItem("position", position);
-          if (department) sessionStorage.setItem("department", department);
-        }
-        
-        // El username viene directamente del token decodificado, no de userData
-        if (tokenInfo.username) {
-          sessionStorage.setItem("username", tokenInfo.username);
-        }
-        
-        setShowWarning(false);
-      }
-    } catch (error) {
-      console.error("Error al extender sesión:", error);
-    }
-  }
-};
+  const closeButton = async () => {
+    setShowWarning(false);
+  };
 
   useEffect(() => {
     checkSession();
@@ -155,7 +127,7 @@ const SessionMonitor = () => {
       onRequestClose={() => setShowWarning(false)}
       timeLeft={timeLeft}
       onLogout={logout}
-      onExtendSession={handleExtendSession}
+      onExtendSession={closeButton}
     />
   );
 };

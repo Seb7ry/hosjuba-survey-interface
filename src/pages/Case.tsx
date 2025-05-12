@@ -8,26 +8,28 @@ const Case = () => {
     const formCards = [
         {
             id: 1,
-            title: "Formulario de Ingreso",
-            description: "Captura los datos de ingreso de pacientes.",
+            title: "Formulario de Casos Preventivos",
+            description: "Registra información detallada sobre casos de atención preventiva, seguimiento y control de riesgos.",
             icon: <FaWpforms />,
+            path: "preventive",
             bgColor: "bg-blue-50",
             textColor: "text-blue-600",
             borderColor: "border-blue-200"
         },
         {
             id: 2,
-            title: "Reporte de Atención",
-            description: "Registra la atención brindada durante la consulta.",
+            title: "Formulario de Mantenimiento de Equipos",
+            description: "Documenta las actividades realizadas durante el mantenimiento preventivo o correctivo de equipos médicos y tecnológicos.",
             icon: <FaFileAlt />,
+            path: "corrective",
             bgColor: "bg-yellow-50",
             textColor: "text-yellow-600",
             borderColor: "border-yellow-200"
         }
     ];
 
-    const handleCardClick = (formId: number) => {
-        navigate(`/form/${formId}`);
+    const handleCardClick = (formPath: string) => {
+        navigate(`/${formPath}`);
     };
 
     return (
@@ -50,7 +52,7 @@ const Case = () => {
                         {formCards.map((card) => (
                             <div
                                 key={card.id}
-                                onClick={() => handleCardClick(card.id)}
+                                onClick={() => handleCardClick(card.path)}
                                 className={`${card.bgColor} ${card.borderColor} border rounded-2xl p-6 cursor-pointer transition-transform duration-300 hover:shadow-lg hover:scale-[1.02]`}
                             >
                                 <div className="flex items-center gap-4 mb-3">
