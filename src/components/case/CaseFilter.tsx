@@ -59,7 +59,7 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                             N° Caso
                         </label>
                         <input
-                            type="text"
+                            type="number"
                             id="caseNumber"
                             name="caseNumber"
                             value={filters.caseNumber}

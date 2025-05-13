@@ -1,7 +1,6 @@
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import type { Case } from "./CaseList";
-import { formatDateTime } from "./CaseList";
-import { getStatusStyles, getPriorityStyles } from "./CaseList";
+import { formatDateTime, getStatusStyles, getPriorityStyles } from "../Utils";
 
 type CaseCardsProps = {
     cases: Case[];
