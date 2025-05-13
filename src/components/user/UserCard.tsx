@@ -1,3 +1,5 @@
+import { FaEdit, FaTrash } from "react-icons/fa";
+
 type User = {
   username: string;
   name: string;
@@ -25,16 +27,19 @@ const UsersCard = ({ users, onEdit, onDelete }: UsersCardsProps) => {
               <div className="flex space-x-2">
                 <button
                   onClick={() => onEdit(user)}
-                  className="text-blue-600 hover:text-blue-900"
+                  className="text-blue-600 hover:text-blue-900 transition-colors"
+                  title="Editar usuario"
                 >
-                  Editar
+                  <FaEdit className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => onDelete(user.username)}
-                  className="text-red-600 hover:text-red-900"
+                  className="text-red-600 hover:text-red-900 transition-colors"
+                  title="Eliminar usuario"
                 >
-                  Eliminar
+                  <FaTrash className="w-4 h-4" />
                 </button>
+
               </div>
             </div>
             <div className="mt-2 text-sm">
