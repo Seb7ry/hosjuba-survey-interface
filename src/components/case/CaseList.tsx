@@ -1,8 +1,10 @@
 import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { searchCases } from "../../services/case.service";
+import CaseCards from "./CaseCard";
+import CaseFilter, { type CaseFilters } from "./CaseFilter";
 
-type Case = {
+export type Case = {
     id: string;
     numero: string;
     dependencia: string;
@@ -12,7 +14,7 @@ type Case = {
     prioridad?: string;
 };
 
-const getStatusStyles = (estado: string) => {
+export const getStatusStyles = (estado: string) => {
     switch (estado) {
         case "Abierto":
             return "bg-yellow-200 text-yellow-800 border-yellow-400 px-3 py-1 rounded-full text-sm";
@@ -25,7 +27,7 @@ const getStatusStyles = (estado: string) => {
     }
 };
 
-const getPriorityStyles = (prioridad: string) => {
+export const getPriorityStyles = (prioridad: string) => {
     switch (prioridad) {
         case "Alta":
             return "bg-red-200 text-red-800 border-red-400 px-3 py-1 rounded-full text-sm";
@@ -40,7 +42,7 @@ const getPriorityStyles = (prioridad: string) => {
     }
 };
 
-const formatDateTime = (isoString: string) => {
+export const formatDateTime = (isoString: string) => {
     if (!isoString) return 'Fecha no disponible';
 
     try {
@@ -64,20 +66,36 @@ const formatDateTime = (isoString: string) => {
     }
 };
 
-const CaseList = () => {
+interface CaseListProps {
+    typeCase: "Mantenimiento" | "Preventivo";
+}
+
+const CaseList = ({ typeCase }: CaseListProps) => {
     const [cases, setCases] = useState<Case[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    const loadCases = async () => {
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    const loadCases = async (filters: CaseFilters = {}) => {
         try {
             setLoading(true);
             setError(null);
 
-            const filters = {
-                typeCase: "Mantenimiento"
+            const queryFilters = {
+                typeCase: typeCase,
+                ...filters
             };
-            const response = await searchCases(filters);
+
+            const response = await searchCases(queryFilters);
 
             const mappedCases = response.map((item: any) => ({
                 id: item._id,
@@ -86,7 +104,7 @@ const CaseList = () => {
                 estado: item.status || "Pendiente",
                 fechaReporte: item.reportedAt || item.createdAt,
                 funcionario: item.reportedBy?.name || "Sin especificar",
-                prioridad: item.serviceData.priority
+                prioridad: item.serviceData?.priority
             }));
 
             setCases(mappedCases);
@@ -103,7 +121,7 @@ const CaseList = () => {
         loadCases();
     }, []);
 
-    if (loading) {
+    if (loading && cases.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -123,7 +141,7 @@ const CaseList = () => {
                     <div className="ml-3">
                         <p className="text-sm text-red-700">{error}</p>
                         <button
-                            onClick={loadCases}
+                            onClick={() => loadCases()}
                             className="mt-2 text-sm text-red-500 hover:text-red-700 font-medium"
                         >
                             Reintentar
@@ -134,136 +152,83 @@ const CaseList = () => {
         );
     }
 
-    // Función para verificar si algún caso tiene prioridad
     const hasPriority = cases.some(caseItem => caseItem.prioridad);
 
     return (
         <div className="space-y-4">
-            {/* Versión para escritorio/tablet (tabla) */}
-            <div className="hidden md:block bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="bg-gray-50 text-gray-600 text-sm">
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
-                            {hasPriority && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Funcionario</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {cases.length > 0 ? (
-                            cases.map((item) => (
-                                <tr
-                                    key={item.id}
-                                    className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
-                                >
-                                    <td className="p-3 lg:p-4 font-medium">{item.numero}</td>
-                                    <td className="p-3 lg:p-4">{item.dependencia}</td>
-                                    {hasPriority && (
-                                        <td className="p-3 lg:p-4">
-                                            {item.prioridad && (
-                                                <span
-                                                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityStyles(item.prioridad)}`}
-                                                >
-                                                    {item.prioridad}
-                                                </span>
-                                            )}
+            <CaseFilter
+                onFilter={(filters) => loadCases(filters)}
+                loading={loading}
+                typeCase={typeCase}
+            />
+
+            {windowWidth >= 1293 ? (
+                <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-gray-50 text-gray-600 text-sm">
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
+                                {hasPriority && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Funcionario</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {cases.length > 0 ? (
+                                cases.map((item) => (
+                                    <tr
+                                        key={item.id}
+                                        className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                                    >
+                                        <td className="px-6 py-4 font-medium">{item.numero}</td>
+                                        <td className="px-6 py-4">{item.dependencia}</td>
+                                        {hasPriority && (
+                                            <td className="px-6 py-4">
+                                                {item.prioridad && (
+                                                    <span className={`inline-flex items-center ${getPriorityStyles(item.prioridad)}`}>
+                                                        {item.prioridad}
+                                                    </span>
+                                                )}
+                                            </td>
+                                        )}
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center ${getStatusStyles(item.estado)}`}>
+                                                {item.estado}
+                                            </span>
                                         </td>
-                                    )}
-                                    <td className="p-3 lg:p-4">
-                                        <span
-                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyles(item.estado)}`}
-                                        >
-                                            {item.estado}
-                                        </span>
-                                    </td>
-                                    <td className="p-3 lg:p-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
-                                    <td className="p-3 lg:p-4">{item.funcionario}</td>
-                                    <td className="p-3 lg:p-4">
-                                        <div className="flex justify-center space-x-4">
-                                            <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
-                                                <FaEye className="w-4 h-4" />
-                                            </button>
-                                            <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
-                                                <FaEdit className="w-4 h-4" />
-                                            </button>
-                                            <button className="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
-                                                <FaTrash className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                        <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
+                                        <td className="px-6 py-4">{item.funcionario}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex justify-center space-x-4">
+                                                <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
+                                                    <FaEye className="w-4 h-4" />
+                                                </button>
+                                                <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
+                                                    <FaEdit className="w-4 h-4" />
+                                                </button>
+                                                <button className="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
+                                                    <FaTrash className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={hasPriority ? 7 : 6} className="px-6 py-4 text-center text-gray-500">
+                                        No se encontraron casos
                                     </td>
                                 </tr>
-                            ))
-                        ) : (
-                            <tr>
-                                <td colSpan={hasPriority ? 7 : 6} className="p-4 text-center text-gray-500">
-                                    No se encontraron casos
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-            </div>
-
-            {/* Versión para móvil (cards) */}
-            <div className="md:hidden space-y-3">
-                {cases.length > 0 ? (
-                    cases.map((item) => (
-                        <div key={item.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <h3 className="font-medium text-gray-900">{item.numero}</h3>
-                                    <p className="text-sm text-gray-600">{item.dependencia}</p>
-                                </div>
-                                <div className="flex flex-col items-end space-y-1">
-                                    <span
-                                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getStatusStyles(item.estado)}`}
-                                    >
-                                        {item.estado}
-                                    </span>
-                                    {item.prioridad && (
-                                        <span
-                                            className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityStyles(item.prioridad)}`}
-                                        >
-                                            {item.prioridad}
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-                                <div>
-                                    <p className="text-gray-500">Fecha</p>
-                                    <p>{formatDateTime(item.fechaReporte)}</p>
-                                </div>
-                                <div>
-                                    <p className="text-gray-500">Funcionario</p>
-                                    <p>{item.funcionario}</p>
-                                </div>
-                            </div>
-
-                            <div className="mt-3 flex justify-end space-x-4">
-                                <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
-                                    <FaEye className="w-4 h-4" />
-                                </button>
-                                <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
-                                    <FaEdit className="w-4 h-4" />
-                                </button>
-                                <button className="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
-                                    <FaTrash className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center text-gray-500">
-                        No se encontraron casos
-                    </div>
-                )}
-            </div>
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <CaseCards cases={cases} hasPriority={hasPriority} />
+            )}
         </div>
     );
 };

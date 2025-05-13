@@ -3,20 +3,22 @@ import CaseList from "./CaseList";
 
 const Corrective = () => {
     return (
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-            {/* Sidebar lateral - oculto en móvil por defecto (se puede activar con un botón) */}
-            <div className="md:block md:w-64 lg:w-72 bg-white shadow-sm">
+        <div className="flex min-h-screen bg-gray-50 relative">
+            {/* Sidebar lateral - oculto en móvil por defecto */}
+            <div className="md:block md:w-64 flex-shrink-0">
                 <Sidebar />
             </div>
 
-            {/* Contenido principal */}
+            {/* Contenido principal - con margen izquierdo cuando el sidebar está visible */}
             <main className="flex-1">
+                {/* Espacio para el header en móvil */}
                 <div className="h-16 md:h-0"></div>
-                <div className="p-4 md:p-6">
-                    <h1 className="text-3xl font-semibold text-gray-800 mb-10 tracking-tight">
+
+                <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
+                    <h1 className="text-3xl font-semibold text-gray-800 mb-6 tracking-tight">
                         Casos Correctivos
                     </h1>
-                    <CaseList />
+                    <CaseList typeCase="Mantenimiento" />
                 </div>
             </main>
         </div>

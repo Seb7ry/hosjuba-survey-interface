@@ -16,9 +16,7 @@ const Dashboard = () => {
         {/* Contenedor del contenido centrado */}
         <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] md:min-h-screen p-4">
           <div className="w-full max-w-4xl bg-white p-6 md:p-8 rounded-xl shadow-lg">
-            <h2 className="text-2xl font-semibold text-center mb-6 text-gray-800">
-              Bienvenido al Dashboard
-            </h2>
+            
             {/* Aquí puedes agregar más contenido */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-blue-50 p-4 rounded-lg">

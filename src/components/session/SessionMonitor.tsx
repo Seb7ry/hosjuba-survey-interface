@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 import SessionWarningModal from "./SessionWarning";
-import { refreshSession } from "../../services/session.service";
 
 interface DecodedToken {
   exp: number;
@@ -74,7 +73,7 @@ const SessionMonitor = () => {
       return;
     }
 
-    const { expirationTime: jwtExpiration, tokenId, username } = getTokenInfo(token);
+    const { expirationTime: jwtExpiration, tokenId } = getTokenInfo(token);
     const backendExpiration = expiredAt ? new Date(expiredAt).getTime() : null;
 
     const effectiveExpiration = backendExpiration && jwtExpiration
@@ -101,11 +100,7 @@ const SessionMonitor = () => {
       markWarningAsShown(tokenId);
     }
   };
-  const formatTime = (ms: number) => {
-    const seconds = Math.max(Math.floor(ms / 1000), 0);
-    return `${seconds} segundos`;
-  };
-
+  
   const closeButton = async () => {
     setShowWarning(false);
   };

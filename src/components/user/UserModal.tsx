@@ -1,12 +1,12 @@
-import { useState, useRef, type ChangeEvent, useEffect } from 'react';
+import { useState, type ChangeEvent, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import SignaturePadModal from '../signature/SignatureModal';
 import ConfirmDialog from '../ConfirmDialog';
 import { getAllDepartments, createDepartment, updateDepartment, deleteDepartment, type DepartmentData } from '../../services/department.service';
 import { getAllPosition, createPosition, updatePosition, deletePosition, type PositionData } from '../../services/position.service';
-import { Modal } from './sub/SubModal';
+import { Modal } from './UserNewModal';
 import { SignatureField } from '../signature/SignatureField';
-import { Selector } from './sub/SubSelector';
+import { Selector } from './UserSelector';
 import { ErrorMessage } from '../ErrorMessage';
 
 type FormData = {
@@ -46,15 +46,14 @@ const UserModal = ({
   const [currentDepartment, setCurrentDepartment] = useState('');
   const [currentPosition, setCurrentPosition] = useState('');
 
-  const [newDepartmentName, setNewDepartmentName] = useState('');
-  const [newPositionName, setNewPositionName] = useState('');
+  const [, setNewDepartmentName] = useState('');
+  const [, setNewPositionName] = useState('');
   const [loadingDepartments, setLoadingDepartments] = useState(true);
   const [loadingPositions, setLoadingPositions] = useState(true);
   const [isProcessingDepartment, setIsProcessingDepartment] = useState(false);
   const [isProcessingPosition, setIsProcessingPosition] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Cargar departamentos y cargos al abrir el modal
   useEffect(() => {

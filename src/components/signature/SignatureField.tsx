@@ -1,5 +1,5 @@
 // components/SignatureField.tsx
-import { useState, useRef, type ChangeEvent } from 'react';
+import { useRef, type ChangeEvent } from 'react';
 import { Upload, Edit2, X } from 'lucide-react';
 
 type SignatureFieldProps = {
@@ -14,7 +14,6 @@ export const SignatureField = ({
   signature,
   onUpload,
   onDraw,
-  onChange,
   onRemove,
 }: SignatureFieldProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
