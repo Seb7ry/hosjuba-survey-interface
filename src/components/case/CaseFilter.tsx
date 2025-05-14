@@ -1,4 +1,5 @@
 import { FaFilter, FaSearch, FaTimes } from "react-icons/fa";
+import { ErrorMessage } from "../ErrorMessage";
 import { useState } from "react";
 
 export type CaseFilters = {
@@ -18,6 +19,7 @@ interface CaseFilterProps {
 
 const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [filters, setFilters] = useState<CaseFilters>({
         caseNumber: "",
         status: "",
@@ -34,6 +36,10 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        if (filters.startDate && filters.endDate && new Date(filters.endDate) < new Date(filters.startDate)) {
+            setErrorMessage("La fecha final no puede ser menor que la inicial");
+            return;
+        }
         onFilter(filters);
     };
 
@@ -51,6 +57,12 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
 
     return (
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4">
+            {errorMessage && (
+                <ErrorMessage
+                    message={errorMessage}
+                    onClose={() => setErrorMessage(null)}
+                />
+            )}
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {/* Filtros básicos */}
@@ -135,6 +147,7 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                                     name="endDate"
                                     value={filters.endDate}
                                     onChange={handleInputChange}
+                                    disabled={!filters.startDate}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                             </div>

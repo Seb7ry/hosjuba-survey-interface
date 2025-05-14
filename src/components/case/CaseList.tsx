@@ -21,6 +21,17 @@ interface CaseListProps {
 
 const ITEMS_PER_PAGE = 10;
 
+type QueryFilters = {
+    typeCase: "Mantenimiento" | "Preventivo";
+    priority?: string;
+    reportedByName?: string;
+    caseNumber?: string;
+    status?: string;
+    startDate?: string;
+    endDate?: string;
+    [key: string]: any;
+};
+
 const CaseList = ({ typeCase }: CaseListProps) => {
     const [cases, setCases] = useState<Case[]>([]);
     const [loading, setLoading] = useState(true);
@@ -43,10 +54,21 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             setLoading(true);
             setError(null);
 
-            const queryFilters = {
+            const queryFilters: QueryFilters = {
                 typeCase: typeCase,
-                ...filters
+                priority: filters.priority,
+                reportedByName: filters.reportedBy,
+                caseNumber: filters.caseNumber,
+                status: filters.status,
+                startDate: filters.startDate,
+                endDate: filters.endDate
             };
+
+            (Object.keys(queryFilters) as Array<keyof QueryFilters>).forEach(key => {
+                if (queryFilters[key] === undefined || queryFilters[key] === '') {
+                    delete queryFilters[key];
+                }
+            });
 
             const response = await searchCases(queryFilters);
 
@@ -62,7 +84,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
             setCases(mappedCases);
             setTotalPages(Math.ceil(mappedCases.length / ITEMS_PER_PAGE));
-            setCurrentPage(1); // Resetear a la primera página cuando cambian los filtros
+            setCurrentPage(1);
         } catch (err) {
             console.error("Error al cargar casos:", err);
             setError("No se pudieron cargar los casos. Intente nuevamente.");
@@ -77,7 +99,6 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         loadCases();
     }, []);
 
-    // Obtener los casos para la página actual
     const getPaginatedCases = () => {
         const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
         return cases.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -134,7 +155,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             <CaseFilter
                 onFilter={(filters) => loadCases(filters)}
                 loading={loading}
-                typeCase={typeCase}  
+                typeCase={typeCase}
             />
 
             {windowWidth >= 1293 ? (
@@ -205,7 +226,6 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                 <CaseCards cases={paginatedCases} hasPriority={hasPriority} />
             )}
 
-            {/* Paginación */}
             {cases.length > ITEMS_PER_PAGE && (
                 <div className="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6 rounded-b-lg">
                     <div className="flex-1 flex justify-between sm:hidden">

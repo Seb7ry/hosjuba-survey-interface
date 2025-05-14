@@ -25,16 +25,29 @@ export const getCaseByNumber = async (caseNumber: any) => {
 }
 
 export const searchCases = async (filters: any) => {
-    const queryParams = new URLSearchParams();
+    try {
+        const queryParams = new URLSearchParams();
 
-    Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-            queryParams.append(key, String(value));
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value !== undefined && value !== null && value !== '') {
+                if (value instanceof Date) {
+                    queryParams.append(key, value.toISOString());
+                } else {
+                    queryParams.append(key, String(value));
+                }
+            }
+        });
+
+        const response = await axios.get(`${API_URL}/case?${queryParams.toString()}`, headers());
+        return response.data;
+    } catch (error: any) {
+        if (error.response) {
+            return error.response.data.message || 'Error al mostrar los casos.';
+        } else {
+            return 'Error al mostrar los casos.';
         }
-    });
+    }
 
-    const response = await axios.get(`${API_URL}/case?${queryParams.toString()}`, headers());
-    return response.data;
 };
 
 
