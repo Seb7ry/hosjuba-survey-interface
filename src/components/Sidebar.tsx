@@ -8,6 +8,7 @@ import {
   ClipboardList,
   BookOpen,
   BarChart2,
+  ChevronLeft, // Icono para el botón de volver
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -21,6 +22,11 @@ const Sidebar = () => {
     navigate("/");
   };
 
+  const handleGoBack = () => {
+    navigate(-1); // Navega a la página anterior
+    setOpen(false);
+  };
+
   const menuItems = [
     { label: "Inicio", icon: <Home size={20} />, path: "/dashboard" },
     { label: "Usuarios", icon: <User size={20} />, path: "/user" },
@@ -32,13 +38,21 @@ const Sidebar = () => {
   return (
     <>
       {!open && (
-        <div className="fixed top-4 left-4 z-40 md:hidden">
+        <div className="fixed top-4 left-4 z-40 md:hidden flex gap-2">
           <button
             onClick={() => setOpen(true)}
             className="p-2 bg-white text-gray-800 rounded-md shadow-md hover:bg-gray-100 transition-colors duration-200"
             aria-label="Abrir menú"
           >
             <Menu size={24} className="text-gray-700" />
+          </button>
+          {/* Botón de volver en móvil */}
+          <button
+            onClick={handleGoBack}
+            className="p-2 bg-white text-gray-800 rounded-md shadow-md hover:bg-gray-100 transition-colors duration-200"
+            aria-label="Volver atrás"
+          >
+            <ChevronLeft size={24} className="text-gray-700" />
           </button>
         </div>
       )}
@@ -67,6 +81,17 @@ const Sidebar = () => {
               aria-label="Cerrar menú"
             >
               <X size={20} />
+            </button>
+          </div>
+
+          {/* Botón de volver en desktop (dentro del sidebar) */}
+          <div className="px-3 pt-2 md:block hidden">
+            <button
+              onClick={handleGoBack}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors duration-200 group"
+            >
+              <ChevronLeft size={20} className="text-gray-500 group-hover:text-blue-600" />
+              <span>Volver</span>
             </button>
           </div>
 

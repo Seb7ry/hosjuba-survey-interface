@@ -49,3 +49,17 @@ export const formatDateTime = (isoString: string) => {
         return 'Fecha inválida';
     }
 };
+
+export const formatLabel = (key: string) => {
+    const prepositions = ["de", "del", "la", "el", "y", "en", "con", "para", "a", "por", "las", "los", "al"];
+    return key
+        .replace(/([A-Z])/g, " $1")           
+        .toLowerCase()
+        .split(/[\s_]+/)                      
+        .map((word, i) =>
+            prepositions.includes(word) && i !== 0
+                ? word
+                : word.charAt(0).toUpperCase() + word.slice(1)
+        )
+        .join(" ");
+};

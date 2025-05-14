@@ -9,7 +9,7 @@ import SessionMonitor from "./components/session/SessionMonitor";
 import Modal from 'react-modal';
 import Corrective from "./components/case/Corrective";
 import Preventive from "./components/case/Preventive";
-import PreventiveForm from "./components/case/PreventiveForm";
+import CaseForm from "./components/case/CaseForm";
 
 if (typeof window !== 'undefined' && document.getElementById('root')) {
   Modal.setAppElement('#root');
@@ -36,8 +36,9 @@ function App() {
           <Route path="/user" element={<User />} />
           <Route path="/case" element={<Case />} />
           <Route path="/corrective" element={<Corrective />} />
+          <Route path="/corrective/new" element={<CaseForm isPreventive={false} />} />
           <Route path="/preventive" element={<Preventive />} />
-          <Route path="/preventive/new" element={<PreventiveForm />} />
+          <Route path="/preventive/new" element={<CaseForm isPreventive={true} />} />
         </Route>
       </Routes>
 

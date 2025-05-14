@@ -1,9 +1,10 @@
 import { useState } from "react";
 
-export const useFormData = (initialType: "Preventivo" | "Correctivo" = "Preventivo") => {
+export const useFormPreventive = () => {
     const [formData, setFormData] = useState({
-        typeCase: initialType,
-        serviceType: "",
+        caseNumber: "",
+        typeCase: "Preventivo",
+        serviceType: "Mantenimiento Preventivo",
         dependency: "",
         status: "Abierto",
         reportedAt: new Date().toISOString(),
@@ -25,72 +26,127 @@ export const useFormData = (initialType: "Preventivo" | "Correctivo" = "Preventi
             brand: "",
             model: "",
             serial: "",
-            inventoryNumber: ""
+            inventoryNumber: "",
+            hardware: {
+                limpiezaDeVentiladores: false,
+                limpiezaUnidadesDeAlmacenamiento: false,
+                limpiezaDeModulosDeMemoria: false,
+                limpiezaDeTarjetasYPlacaMadre: false,
+                limpiezaFuenteDePoder: false,
+                limpiezaExternaChasis: false,
+                reconexionYAjusteDeProcesador: false,
+                reconexionYAjusteDeModulosDeMemoriaRAM: false,
+                reconexionYAjusteTarjetasDeExpansion: false,
+                reconexionYAjusteDeUnidadesDeAlmacenamiento: false,
+                reconexionYAjusteDeFuenteDePoder: false,
+                reconexionYAjusteDePuertosDeChasis: false,
+                reconexionYAjusteDeTeclado: false,
+                reconexionYAjusteDeMouse: false,
+                reconexionYAjusteDeMonitor: false,
+                reconexionYAjusteImpresora: false,
+                reconexionYAjusteDeEscaner: false,
+                reconexionYAjusteDeCableDePoder: false,
+                reconexionYAjusteDeClabeDeRed: false,
+                reconexionYAjusteDeAdaptadorDeCorriente: false,
+                verificacionDeFuncionamiento: false,
+                inventarioDeHardware: false
+            },
+            software: {
+                actualizacionOCambioDelSistemaOperativo: false,
+                confirmarUsuarioYContrasenaAdministradorLocal: false,
+                confirmarOAsignarContrasenaEstandar: false,
+                configuracionDeSegmentoDeRedYDnsDeConexionADominioEInternet: false,
+                identificacionDeUnidadesDeAlmacenamiento: false,
+                comprobacionYReparacionDeErroresDeDiscoDuro: false,
+                desfragmentacionDeDiscoDuro: false,
+                eliminacionDeArchivosTemporales: false,
+                actualizacionConfiguracionYSolucionesDeSeguridadInformaticaTraficoSeguro: false,
+                confirmarSeguridadDeWindowsBitlockerEnParticionesDeDisco: false,
+                confirmarInstalarYConfigurarServicioDeMensajeriaInterna: false,
+                confirmarInstalarServicioRemotoYHabilitarReglasEnElFirewall: false,
+                confirmarUsuarioDeDominioEnActiveDirectoryDeAcuerdoAlServicio: false,
+                confirmacionDeAplicacionesEquiposDeUsoAsistencial: false,
+                confirmacionDeAplicacionesEquiposDeUsoAdministrativo: false,
+                confirmacionDeUnidadDeAlmacenamientoDestinadaParaElUsuario: false,
+                instalarRecursosCompartidosImpresorasOEscaner: false,
+                configuracionServicioDeNubeYServiciosTecnologicos: false,
+                activacionPlanDeEnergia: false,
+                crearPuntoDeRestauracion: false,
+                inventarioDeSoftware: false
+            },
+            printers: {
+                limpiezaInterna: false,
+                lubricacionYAjusteSistemaEngranaje: false,
+                limpiezaExterna: false,
+                verificacionDeFuncionamiento: false,
+                activacionModoBorradorYAhorroDeEnergia: false
+            },
+            phones: {
+                verificacionYAjusteDeCablesDeConexion: false,
+                verificacionDeFuncionamiento: false,
+                verificacionDeDisponibilidadYFuncionamientoDeLaExtensionTelefonica: false,
+                limpieza: false
+            },
+            scanners: {
+                verificacionYAjusteDeCablesDeConexion: false,
+                verificacionDeFuncionamiento: false,
+                limpieza: false
+            }
+        }
+    });
+
+    return { formData, setFormData };
+};
+
+export const useFormCorrective = () => {
+    const [formData, setFormData] = useState({
+        caseNumber: "",
+        typeCase: "Mantenimiento",
+        serviceType: "",
+        dependency: "",
+        status: "Abierto",
+        reportedAt: new Date().toISOString(),
+        observations: "",
+        reportedBy: {
+            _id: "",
+            name: "",
+            position: "",
+            department: ""
         },
-        hardware: {
-            cleanFans: false,
-            cleanStorageUnits: false,
-            cleanMemoryModules: false,
-            cleanMotherboard: false,
-            cleanPowerSupply: false,
-            cleanChassis: false,
-            reconnectProcessor: false,
-            reconnectRAM: false,
-            reconnectExpansionCards: false,
-            reconnectStorageUnits: false,
-            reconnectPowerSupply: false,
-            reconnectChassisPorts: false,
-            reconnectKeyboard: false,
-            reconnectMouse: false,
-            reconnectMonitor: false,
-            reconnectPrinter: false,
-            reconnectScanner: false,
-            reconnectPowerCable: false,
-            reconnectNetworkCable: false,
-            reconnectCharger: false,
-            functionCheck: false,
-            hardwareInventory: false
+        assignedTechnician: {
+            _id: "",
+            name: "",
+            position: "",
+            signature: ""
         },
-        software: {
-            osUpdate: false,
-            localAdminPassword: false,
-            standardUserPassword: false,
-            networkConfig: false,
-            identifyStorage: false,
-            repairDiskErrors: false,
-            defragDisk: false,
-            deleteTempFiles: false,
-            securityUpdate: false,
-            bitlockerCheck: false,
-            messagingService: false,
-            remoteAccessFirewall: false,
-            domainUserCheck: false,
-            assistiveApps: false,
-            adminApps: false,
-            userStorage: false,
-            sharedResources: false,
-            cloudServiceConfig: false,
-            powerPlan: false,
-            createRestorePoint: false,
-            softwareInventory: false
-        },
-        printers: {
-            internalCleaning: false,
-            gearLubrication: false,
-            externalCleaning: false,
-            functionCheck: false,
-            draftMode: false
-        },
-        phones: {
-            cableCheck: false,
-            functionCheck: false,
-            extensionCheck: false,
-            cleaning: false
-        },
-        scanners: {
-            cableCheck: false,
-            functionCheck: false,
-            cleaning: false
+        serviceData: {
+            attendedAt: "",
+            solvedAt: "",
+            priority: "",
+            category: "",
+            level: "",
+            equipments: [{
+                name: "",
+                brand: "",
+                model: "",
+                serial: "",
+                inventoryNumber: ""
+            }],
+            diagnosis: "",
+            solution: "",
+            conventions: 0,
+            materials: [{
+                quantity: 0,
+                description: ""
+            }],
+            requiresEscalation: false,
+            escalatedTechnician: {
+                _id: "",
+                name: "",
+                position: "",
+                department: "",
+                signature: ""
+            }
         }
     });
 

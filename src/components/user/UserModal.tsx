@@ -55,7 +55,6 @@ const UserModal = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Cargar departamentos y cargos al abrir el modal
   useEffect(() => {
     if (isOpen) {
       loadDepartments();
