@@ -29,7 +29,7 @@ export const SignatureField = ({
               className="max-h-20 object-contain"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap justify-center gap-2 w-full">
             <button
               type="button"
               onClick={onDraw}
