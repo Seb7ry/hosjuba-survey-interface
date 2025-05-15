@@ -13,7 +13,7 @@ const GroupItem = ({ title, children, defaultOpen = false }: GroupItemProps) => 
   return (
     <div className="mb-4 border rounded-lg overflow-hidden shadow-sm">
       <button
-        type="button" // Esto es lo importante para evitar el submit
+        type="button"
         className="w-full flex justify-between items-center p-4 text-left bg-white hover:bg-gray-50 transition-colors duration-200"
         onClick={() => setIsOpen(!isOpen)}
       >

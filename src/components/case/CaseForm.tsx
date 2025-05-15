@@ -1,10 +1,9 @@
-// PreventiveForm.tsx o CorrectiveForm.tsx
 import { createCase } from "../../services/case.service";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFormPreventive, useFormCorrective } from "../Data";
-import HeadForm from "./Form/HeadForm";
-import BodyForm from "./Form/BodyForm";
+import HeadForm from "./form/HeadForm";
+import BodyForm from "./form/BodyForm";
 
 interface FormContainerProps {
   isPreventive: boolean;
@@ -14,27 +13,27 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
   const navigate = useNavigate();
   const preventiveData = useFormPreventive();
   const correctiveData = useFormCorrective();
-  
+
   const { formData, setFormData } = isPreventive ? preventiveData : correctiveData;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
+    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
 
     if (name.includes('.')) {
-      const [parent, child] = name.split('.');
+      const keys = name.split('.');
 
       setFormData((prev: any) => {
-        if (parent in prev && typeof prev[parent as keyof typeof prev] === 'object') {
-          return {
-            ...prev,
-            [parent]: {
-              ...(prev[parent as keyof typeof prev] as object),
-              [child]: type === 'checkbox' ? checked : value
-            }
-          };
+        const newState = { ...prev };
+
+        let current = newState;
+        for (let i = 0; i < keys.length - 1; i++) {
+          current = current[keys[i]] = { ...current[keys[i]] };
         }
-        return prev;
+
+        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+
+        return newState;
       });
     } else {
       setFormData((prev: any) => ({
@@ -69,14 +68,14 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
           </h1>
 
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <HeadForm 
-              formData={formData} 
-              handleChange={handleChange} 
+            <HeadForm
+              formData={formData}
+              handleChange={handleChange}
               setFormData={setFormData}
               isPreventive={isPreventive}
             />
-            <BodyForm 
-              formData={formData} 
+            <BodyForm
+              formData={formData}
               handleChange={handleChange}
               isPreventive={isPreventive}
             />

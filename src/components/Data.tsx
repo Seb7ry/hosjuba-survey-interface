@@ -125,6 +125,8 @@ export const useFormCorrective = () => {
             priority: "",
             category: "",
             level: "",
+            diagnosis: "",
+            solution: "",
             equipments: [{
                 name: "",
                 brand: "",
@@ -132,8 +134,6 @@ export const useFormCorrective = () => {
                 serial: "",
                 inventoryNumber: ""
             }],
-            diagnosis: "",
-            solution: "",
             conventions: 0,
             materials: [{
                 quantity: 0,
@@ -152,3 +152,32 @@ export const useFormCorrective = () => {
 
     return { formData, setFormData };
 };
+
+export const serviceCategories = [
+    "Ayudas Audiovisuales",
+    "CCTV",
+    "Correo Electronico - Sitio Web",
+    "Directorio Activo",
+    "Hardware",
+    "Herramientas Ofimaticas",
+    "Mantenimientos Preventivos",
+    "Perifericos",
+    "Red",
+    "Seguridad",
+    "Sistemas de Informacion Externos",
+    "Sistemas de Informacion Internos",
+    "Sistema Electrico Regulado",
+    "Software",
+    "Telefonia",
+    "Traslado e Instalación",
+    "Videoconferencia",
+] as const;
+export type ServiceCategory = typeof serviceCategories[number];
+
+export const serviceLevels = [
+    "Soporte Nivel 1",
+    "Soporte Nivel 2",
+    "Soporte Nivel 3",
+    "ANS Basado en el Servicio",
+] as const;
+export type serviceLevels = typeof serviceLevels[number];

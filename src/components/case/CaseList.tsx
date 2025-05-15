@@ -1,9 +1,11 @@
 import { FaEdit, FaTrash, FaEye, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useEffect, useState } from "react";
-import { searchCases } from "../../services/case.service";
+import { searchCases, deleteCase } from "../../services/case.service";
 import CaseCards from "./CaseCard";
 import CaseFilter, { type CaseFilters } from "./CaseFilter";
 import { formatDateTime, getStatusStyles, getPriorityStyles } from "../Utils";
+import ConfirmDialog from "../ConfirmDialog";
+import { ErrorMessage } from "../ErrorMessage";
 
 export type Case = {
     id: string;
@@ -39,6 +41,10 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [caseToDelete, setCaseToDelete] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
+    const [showError, setShowError] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -53,6 +59,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         try {
             setLoading(true);
             setError(null);
+            setShowError(false);
 
             const queryFilters: QueryFilters = {
                 typeCase: typeCase,
@@ -88,6 +95,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         } catch (err) {
             console.error("Error al cargar casos:", err);
             setError("No se pudieron cargar los casos. Intente nuevamente.");
+            setShowError(true);
             setCases([]);
             setTotalPages(1);
         } finally {
@@ -116,6 +124,34 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         }
     };
 
+    const handleDeleteClick = (caseId: string) => {
+        setCaseToDelete(caseId);
+        setShowConfirmDialog(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!caseToDelete) return;
+        
+        try {
+            setIsDeleting(true);
+            await deleteCase(caseToDelete);
+            await loadCases();
+        } catch (err) {
+            console.error("Error al eliminar caso:", err);
+            setError("No se pudo eliminar el caso. Intente nuevamente.");
+            setShowError(true);
+        } finally {
+            setIsDeleting(false);
+            setShowConfirmDialog(false);
+            setCaseToDelete(null);
+        }
+    };
+
+    const handleCancelDelete = () => {
+        setShowConfirmDialog(false);
+        setCaseToDelete(null);
+    };
+
     if (loading && cases.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -124,34 +160,26 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         );
     }
 
-    if (error) {
-        return (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4">
-                <div className="flex">
-                    <div className="flex-shrink-0">
-                        <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                    </div>
-                    <div className="ml-3">
-                        <p className="text-sm text-red-700">{error}</p>
-                        <button
-                            onClick={() => loadCases()}
-                            className="mt-2 text-sm text-red-500 hover:text-red-700 font-medium"
-                        >
-                            Reintentar
-                        </button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    const hasPriority = cases.some(caseItem => caseItem.prioridad);
     const paginatedCases = getPaginatedCases();
+    const hasPriority = cases.some(caseItem => caseItem.prioridad);
 
     return (
         <div className="space-y-4">
+            {showError && error && (
+                <ErrorMessage 
+                    message={error} 
+                    onClose={() => setShowError(false)} 
+                />
+            )}
+
+            <ConfirmDialog
+                isOpen={showConfirmDialog}
+                message="¿Estás seguro que deseas eliminar este caso? Esta acción no se puede deshacer."
+                onCancel={handleCancelDelete}
+                onConfirm={handleConfirmDelete}
+                isProcessing={isDeleting}
+            />
+
             <CaseFilter
                 onFilter={(filters) => loadCases(filters)}
                 loading={loading}
@@ -174,7 +202,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                         </thead>
                         <tbody className="divide-y divide-gray-100">
                             {paginatedCases.length > 0 ? (
-                                paginatedCases.map((item) => (
+                                paginatedCases.map((item: Case) => (
                                     <tr
                                         key={item.id}
                                         className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
@@ -205,7 +233,12 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                                 <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
                                                     <FaEdit className="w-4 h-4" />
                                                 </button>
-                                                <button className="text-red-600 hover:text-red-900 transition-colors" title="Eliminar">
+                                                <button 
+                                                    className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    title="Eliminar"
+                                                    onClick={() => handleDeleteClick(item.numero)}
+                                                    disabled={isDeleting}
+                                                >
                                                     <FaTrash className="w-4 h-4" />
                                                 </button>
                                             </div>
@@ -223,7 +256,13 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     </table>
                 </div>
             ) : (
-                <CaseCards cases={paginatedCases} hasPriority={hasPriority} />
+                <CaseCards
+                    cases={paginatedCases}
+                    onDelete={handleDeleteClick}
+                    isDeleting={isDeleting}
+                    error={error || undefined}
+                    onErrorClose={() => setShowError(false)}
+                />
             )}
 
             {cases.length > ITEMS_PER_PAGE && (

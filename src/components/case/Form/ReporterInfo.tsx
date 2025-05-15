@@ -84,17 +84,18 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
   return (
     <div className="mb-8">
       <h2 className="text-xl font-medium text-gray-700 mb-4 border-b pb-2">Quien Reporta</h2>
-      <p className="text-sm text-gray-500 mb-4">Puede buscar al usuario por ID o por Nombre</p>
+      <p className="text-sm text-gray-500 mb-4">Puede buscar al usuario por su @Username o por Nombre</p>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Campo de búsqueda por ID */}
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">ID Usuario</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre de Usuario*</label>
           <div className="relative">
             <input
               type="text"
               name="reportedBy._id"
               value={formData.reportedBy._id}
+              placeholder="Seleccione el @ del usuario"
               onChange={handleIdChange}
               onFocus={() => setShowDropdownById(true)}
               onBlur={() => setTimeout(() => setShowDropdownById(false), 200)}
@@ -120,7 +121,7 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
                   onClick={() => selectUser(user)}
                 >
                   <div className="flex flex-col">
-                    <span className="font-medium">{user.username}</span>
+                    <span className="font-medium">@{user.username}</span>
                     <span className="text-gray-500">{user.name}</span>
                   </div>
                 </li>
@@ -135,6 +136,7 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
           <div className="relative">
             <input
               type="text"
+              placeholder="Seleccione el nombre del usuario"
               name="reportedBy.name"
               value={formData.reportedBy.name}
               onChange={handleNameChange}

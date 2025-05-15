@@ -63,6 +63,7 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
           <input
             type="number"
             name="caseNumber"
+            placeholder="Digite el número de caso"
             value={formData.caseNumber}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
@@ -98,6 +99,7 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
             <input
               type="text"
               name="dependency"
+              placeholder="Digite la dependencia del caso"
               value={formData.dependency}
               onChange={handleInputChange}
               onFocus={() => setShowDropdown(true)}
