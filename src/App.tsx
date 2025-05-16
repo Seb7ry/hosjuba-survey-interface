@@ -10,6 +10,7 @@ import Modal from 'react-modal';
 import Corrective from "./components/case/Corrective";
 import Preventive from "./components/case/Preventive";
 import CaseForm from "./components/case/CaseForm";
+import Equipment from "./pages/Equipment";
 
 if (typeof window !== 'undefined' && document.getElementById('root')) {
   Modal.setAppElement('#root');
@@ -34,6 +35,7 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/user" element={<User />} />
+          <Route path="/equipment" element={<Equipment />} />
           <Route path="/case" element={<Case />} />
           <Route path="/corrective" element={<Corrective />} />
           <Route path="/corrective/new" element={<CaseForm isPreventive={false} />} />

@@ -1,9 +1,13 @@
+import { useState } from "react";
 import { createCase } from "../../services/case.service";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFormPreventive, useFormCorrective } from "../Data";
+import type { CustomChangeEvent } from "./form/BodyForm";
 import HeadForm from "./form/HeadForm";
 import BodyForm from "./form/BodyForm";
+import ConfirmDialog from "../ConfirmDialog";
+import SuccessDialog from "../SuccessDialog";
 
 interface FormContainerProps {
   isPreventive: boolean;
@@ -13,44 +17,71 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
   const navigate = useNavigate();
   const preventiveData = useFormPreventive();
   const correctiveData = useFormCorrective();
-
   const { formData, setFormData } = isPreventive ? preventiveData : correctiveData;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = type === 'checkbox' ? (e.target as HTMLInputElement).checked : undefined;
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [createdCaseNumber, setCreatedCaseNumber] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | CustomChangeEvent
+  ) => {
+    const target = 'nativeEvent' in e ? e.target : e.target;
+    const name = target.name;
+    const value = target.value;
+    const type = 'type' in target ? target.type : 'text';
+    const checked = type === 'checkbox' && 'checked' in target ? target.checked : undefined;
 
     if (name.includes('.')) {
       const keys = name.split('.');
-
       setFormData((prev: any) => {
         const newState = { ...prev };
-
         let current = newState;
         for (let i = 0; i < keys.length - 1; i++) {
           current = current[keys[i]] = { ...current[keys[i]] };
         }
-
         current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
-
         return newState;
       });
     } else {
       setFormData((prev: any) => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : value
+        [name]: type === 'checkbox' ? checked : value,
       }));
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setShowConfirmDialog(true);
+  };
+
+  const confirmCreateCase = async () => {
+    setShowConfirmDialog(false);
+    setIsSubmitting(true);
+
     try {
-      await createCase(formData);
-      navigate(isPreventive ? '/preventive' : '/corrective');
-    } catch (error) {
+      console.log("Datos que se enviarán al backend:", formData); // 👈 Agrega esto
+      console.log("Payload enviado:", JSON.stringify(formData, null, 2));
+
+      const createdCase = await createCase(formData);
+      
+      console.log("Respuesta del backend:", createdCase);
+      setCreatedCaseNumber(createdCase.caseNumber);
+      setShowSuccessDialog(true);
+    } catch (error: any) {
       console.error("Error creating case:", error);
+      alert('Error al crear el caso. Por favor intente nuevamente.');
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+
+  const handleSuccessDialogClose = () => {
+    setShowSuccessDialog(false);
+    navigate(isPreventive ? '/preventive' : '/corrective');
   };
 
   return (
@@ -91,13 +122,38 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
               <button
                 type="submit"
                 className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                disabled={isSubmitting}
               >
-                {isPreventive ? 'Crear Caso Preventivo' : 'Crear Caso de Mantenimiento'}
+                {isSubmitting ? (
+                  <span className="flex items-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Procesando...
+                  </span>
+                ) : (
+                  isPreventive ? 'Crear Caso Preventivo' : 'Crear Caso de Mantenimiento'
+                )}
               </button>
             </div>
           </form>
         </div>
       </main>
+
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        message="¿Estás seguro que deseas crear este caso?"
+        onCancel={() => setShowConfirmDialog(false)}
+        onConfirm={confirmCreateCase}
+        isProcessing={isSubmitting}
+      />
+
+      <SuccessDialog
+        isOpen={showSuccessDialog}
+        caseNumber={createdCaseNumber}
+        onClose={handleSuccessDialogClose}
+      />
     </div>
   );
 };

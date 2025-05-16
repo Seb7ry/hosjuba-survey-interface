@@ -26,7 +26,7 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
             <h2 className="text-xl font-medium text-gray-700 mb-4 border-b pb-2">Información del Equipo</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tipo*</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre*</label>
                     <input
                         type="text"
                         name="serviceData.type"

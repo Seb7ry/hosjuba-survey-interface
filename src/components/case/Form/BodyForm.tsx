@@ -1,7 +1,7 @@
 import CorrectiveBody from "./CorrectiveBody";
 import PreventiveBody from "./PreventiveBody";
 
-type CustomChangeEvent = {
+export type CustomChangeEvent = {
   target: {
     name: string;
     value: string;

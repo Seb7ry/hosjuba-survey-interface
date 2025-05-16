@@ -99,26 +99,7 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                         </select>
                     </div>
 
-                    {typeCase === "Mantenimiento" && (
-                        <div>
-                            <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
-                                Prioridad
-                            </label>
-                            <select
-                                id="priority"
-                                name="priority"
-                                value={filters.priority}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
-                            >
-                                <option value="">Todas</option>
-                                <option value="Alta">Alta</option>
-                                <option value="Media">Media</option>
-                                <option value="Baja">Baja</option>
-                                <option value="Crítico">Crítico</option>
-                            </select>
-                        </div>
-                    )}
+
 
                     {/* Filtros avanzados */}
                     {showAdvancedFilters && (
@@ -151,6 +132,27 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                                 />
                             </div>
+
+                            {typeCase === "Mantenimiento" && (
+                                <div>
+                                    <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                                        Prioridad
+                                    </label>
+                                    <select
+                                        id="priority"
+                                        name="priority"
+                                        value={filters.priority}
+                                        onChange={handleInputChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
+                                    >
+                                        <option value="">Todas</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Baja">Baja</option>
+                                        <option value="Crítico">Crítico</option>
+                                    </select>
+                                </div>
+                            )}
 
                             <div>
                                 <label htmlFor="reportedBy" className="block text-sm font-medium text-gray-700 mb-1">

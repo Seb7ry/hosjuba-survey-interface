@@ -6,7 +6,7 @@ import { getAllDepartments, createDepartment, updateDepartment, deleteDepartment
 import { getAllPosition, createPosition, updatePosition, deletePosition, type PositionData } from '../../services/position.service';
 import { Modal } from './UserNewModal';
 import { SignatureField } from '../signature/SignatureField';
-import { Selector } from './UserSelector';
+import { Selector } from '../Selector';
 import { ErrorMessage } from '../ErrorMessage';
 
 type FormData = {

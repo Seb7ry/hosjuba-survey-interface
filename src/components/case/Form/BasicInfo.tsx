@@ -59,19 +59,6 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
       <h2 className="text-xl font-medium text-gray-700 mb-4 border-b pb-2">Información Básica</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Número de Caso*</label>
-          <input
-            type="number"
-            name="caseNumber"
-            placeholder="Digite el número de caso"
-            value={formData.caseNumber}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            required
-          />
-        </div>
-
-        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Servicio*</label>
           {isPreventive ? (
             <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
@@ -88,7 +75,7 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
               <option value="">Seleccione...</option>
               <option value="Solicitud">Solicitud</option>
               <option value="Incidente">Incidente</option>
-              <option value="Concepto técnico">Concepto técnico</option>
+              <option value="Concepto técnico">Concepto Técnico</option>
             </select>
           )}
         </div>
@@ -153,15 +140,29 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
           </select>
         </div>
 
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-          <textarea
-            name="observations"
-            value={formData.observations}
-            onChange={handleChange}
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-          />
+        {/* Textareas en una sola fila para pantallas grandes */}
+        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Descripción del Servicio*</label>
+            <textarea
+              name="serviceData.description"
+              value={formData.serviceData.description}
+              onChange={handleChange}
+              rows={3}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
+            <textarea
+              name="observations"
+              value={formData.observations}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            />
+          </div>
         </div>
       </div>
     </div>

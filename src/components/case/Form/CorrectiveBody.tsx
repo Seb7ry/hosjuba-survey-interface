@@ -1,88 +1,114 @@
 import { type ChangeEvent } from "react";
 
-type CustomChangeEvent = {
-    target: {
-        name: string;
-        value: any;
-    };
-};
+interface Equipment {
+    name: string;
+    brand: string;
+    model: string;
+    serial: string;
+    inventoryNumber: string;
+}
+
+interface Material {
+    quantity: number;
+    description: string;
+}
 
 interface CorrectiveBodyProps {
     formData: any;
-    handleChange: (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | CustomChangeEvent) => void;
+    handleChange: (e: {
+        target: {
+            name: string;
+            value: any;
+        };
+    }) => void;
 }
 
 const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const handleEquipmentChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const newEvent = {
-            target: {
-                name: `serviceData.equipments[${index}].${name}`,
-                value: value
-            }
-        } as unknown as ChangeEvent<HTMLInputElement>;
-        handleChange(newEvent);
-    };
-    
-    const addEquipment = () => {
-        const newEvent = {
-            target: {
-                name: "serviceData.equipments",
-                value: [
-                    ...formData.serviceData.equipments,
-                    { name: "", brand: "", model: "", serial: "", inventoryNumber: "" }
-                ]
-            }
-        } as unknown as ChangeEvent<HTMLInputElement>;
-        handleChange(newEvent);
-    };
+        const updatedEquipments = [...formData.serviceData.equipments];
+        updatedEquipments[index] = {
+            ...updatedEquipments[index],
+            [name]: value
+        };
 
-    const removeEquipment = (index: number) => {
-        const updatedEquipments = formData.serviceData.equipments.filter((_: any, i: number) => i !== index);
-        const newEvent = {
+        handleChange({
             target: {
                 name: "serviceData.equipments",
                 value: updatedEquipments
             }
-        } as unknown as ChangeEvent<HTMLInputElement>;
-        handleChange(newEvent);
+        });
+    };
+
+    const addEquipment = () => {
+        const newEquipment: Equipment = {
+            name: "",
+            brand: "",
+            model: "",
+            serial: "",
+            inventoryNumber: ""
+        };
+
+        handleChange({
+            target: {
+                name: "serviceData.equipments",
+                value: [...formData.serviceData.equipments, newEquipment]
+            }
+        });
+    };
+
+    const removeEquipment = (index: number) => {
+        const updatedEquipments = formData.serviceData.equipments
+            .filter((_: any, i: number) => i !== index);
+
+        handleChange({
+            target: {
+                name: "serviceData.equipments",
+                value: updatedEquipments
+            }
+        });
     };
 
     const handleMaterialChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const newEvent = {
-            ...e,
-            target: {
-                ...e.target,
-                name: `serviceData.materials[${index}].${name}`,
-                value: name === "quantity" ? parseInt(value) || 0 : value
-            }
+        const updatedMaterials = [...formData.serviceData.materials];
+        updatedMaterials[index] = {
+            ...updatedMaterials[index],
+            [name]: name === "quantity" ? parseInt(value) || 0 : value
         };
-        handleChange(newEvent);
-    };
 
-    const addMaterial = () => {
-        const newEvent = {
-            target: {
-                name: "serviceData.materials",
-                value: [
-                    ...formData.serviceData.materials,
-                    { quantity: 0, description: "" }
-                ]
-            }
-        } as unknown as ChangeEvent<HTMLInputElement>;
-        handleChange(newEvent);
-    };
-
-    const removeMaterial = (index: number) => {
-        const updatedMaterials = formData.serviceData.materials.filter((_: any, i: number) => i !== index);
-        const newEvent = {
+        handleChange({
             target: {
                 name: "serviceData.materials",
                 value: updatedMaterials
             }
-        } as unknown as ChangeEvent<HTMLInputElement>;
-        handleChange(newEvent);
+        });
+    };
+
+    const addMaterial = () => {
+        const newMaterial: Material = {
+            quantity: 0,
+            description: ""
+        };
+
+        handleChange({
+            target: {
+                name: "serviceData.materials",
+                value: [...formData.serviceData.materials, newMaterial]
+            }
+        });
+    };
+
+    const removeMaterial = (index: number) => {
+        const updatedMaterials = formData.serviceData.materials
+            .filter((_: any, i: number) => i !== index);
+
+        handleChange({
+            target: {
+                name: "serviceData.materials",
+                value: updatedMaterials
+            }
+        });
     };
 
     return (

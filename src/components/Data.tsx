@@ -2,7 +2,7 @@ import { useState } from "react";
 
 export const useFormPreventive = () => {
     const [formData, setFormData] = useState({
-        caseNumber: "",
+        caseNumber: "202X",
         typeCase: "Preventivo",
         serviceType: "Mantenimiento Preventivo",
         dependency: "",
@@ -35,7 +35,7 @@ export const useFormPreventive = () => {
                 limpiezaFuenteDePoder: false,
                 limpiezaExternaChasis: false,
                 reconexionYAjusteDeProcesador: false,
-                reconexionYAjusteDeModulosDeMemoriaRAM: false,
+                reconexionYAjusteDeModulosDeMemoriaRam: false,
                 reconexionYAjusteTarjetasDeExpansion: false,
                 reconexionYAjusteDeUnidadesDeAlmacenamiento: false,
                 reconexionYAjusteDeFuenteDePoder: false,
@@ -100,7 +100,7 @@ export const useFormPreventive = () => {
 
 export const useFormCorrective = () => {
     const [formData, setFormData] = useState({
-        caseNumber: "",
+        caseNumber: "202X",
         typeCase: "Mantenimiento",
         serviceType: "",
         dependency: "",
@@ -120,6 +120,7 @@ export const useFormCorrective = () => {
             signature: ""
         },
         serviceData: {
+            description:"",
             attendedAt: "",
             solvedAt: "",
             priority: "",
@@ -127,6 +128,8 @@ export const useFormCorrective = () => {
             level: "",
             diagnosis: "",
             solution: "",
+            conventions: 0,
+            requiresEscalation: false,
             equipments: [{
                 name: "",
                 brand: "",
@@ -134,18 +137,17 @@ export const useFormCorrective = () => {
                 serial: "",
                 inventoryNumber: ""
             }],
-            conventions: 0,
             materials: [{
                 quantity: 0,
                 description: ""
             }],
-            requiresEscalation: false,
             escalatedTechnician: {
                 _id: "",
                 name: "",
                 position: "",
                 department: "",
-                signature: ""
+                signature: "",
+                level: ""
             }
         }
     });
@@ -172,6 +174,7 @@ export const serviceCategories = [
     "Traslado e Instalación",
     "Videoconferencia",
 ] as const;
+
 export type ServiceCategory = typeof serviceCategories[number];
 
 export const serviceLevels = [
@@ -180,4 +183,5 @@ export const serviceLevels = [
     "Soporte Nivel 3",
     "ANS Basado en el Servicio",
 ] as const;
-export type serviceLevels = typeof serviceLevels[number];
+
+export type ServiceLevel = typeof serviceLevels[number];

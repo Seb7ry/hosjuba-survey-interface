@@ -1,6 +1,6 @@
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import ConfirmDialog from '../ConfirmDialog';
+import ConfirmDialog from './ConfirmDialog';
 
 type SelectorProps = {
   value: string;
