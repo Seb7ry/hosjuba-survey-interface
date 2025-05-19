@@ -85,6 +85,7 @@ const CorrectiveInfo = ({ formData, handleChange }: CorrectiveBodyProps) => {
                         ))}
                     </select>
                 </div>
+
                 <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Diagnóstico</label>

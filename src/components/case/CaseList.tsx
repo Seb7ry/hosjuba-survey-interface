@@ -131,7 +131,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
     const handleConfirmDelete = async () => {
         if (!caseToDelete) return;
-        
+
         try {
             setIsDeleting(true);
             await deleteCase(caseToDelete);
@@ -166,9 +166,9 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     return (
         <div className="space-y-4">
             {showError && error && (
-                <ErrorMessage 
-                    message={error} 
-                    onClose={() => setShowError(false)} 
+                <ErrorMessage
+                    message={error}
+                    onClose={() => setShowError(false)}
                 />
             )}
 
@@ -192,11 +192,12 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                         <thead>
                             <tr className="bg-gray-50 text-gray-600 text-sm">
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipo</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
                                 {hasPriority && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Funcionario</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
@@ -208,6 +209,8 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                         className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
                                     >
                                         <td className="px-6 py-4 font-medium">{item.numero}</td>
+                                        <td className="px-6 py-4">{item.dependencia}</td>
+                                        <td className="px-6 py-4">{item.dependencia}</td>
                                         <td className="px-6 py-4">{item.dependencia}</td>
                                         {hasPriority && (
                                             <td className="px-6 py-4">
@@ -224,7 +227,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
-                                        <td className="px-6 py-4">{item.funcionario}</td>
+                                        
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center space-x-4">
                                                 <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
@@ -233,7 +236,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                                 <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
                                                     <FaEdit className="w-4 h-4" />
                                                 </button>
-                                                <button 
+                                                <button
                                                     className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     title="Eliminar"
                                                     onClick={() => handleDeleteClick(item.numero)}

@@ -18,8 +18,9 @@ const headers = () => ({
 export type EquipmentData = {
     name: string;
     brand: string;
-    type: string;
     model: string;
+    type: string;
+    department: string;
     serial?: string;
     numberInventory?: string;
 };
@@ -46,6 +47,8 @@ export const createEquipment = async (equipmentData: EquipmentData): Promise<Equ
             name: equipmentData.name,
             brand: equipmentData.brand,
             model: equipmentData.model,
+            type: equipmentData.type,
+            department: equipmentData.department,
             serial: equipmentData.serial,
             numberInventory: equipmentData.numberInventory
         }, headers());

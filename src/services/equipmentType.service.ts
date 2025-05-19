@@ -46,10 +46,10 @@ export const createEquipmentType = async (name: string): Promise<EquipmentTypeDa
     }
 };
 
-export const updateEquipmentType = async (id: string, newName: string): Promise<EquipmentTypeData> => {
+export const updateEquipmentType = async (lastName: string, newName: string): Promise<EquipmentTypeData> => {
     try {
         const response = await axios.put(
-            `${API_URL}/equip-type/${id}`,
+            `${API_URL}/equip-type/${lastName}`,
             { newName },
             headers()
         );
@@ -60,10 +60,10 @@ export const updateEquipmentType = async (id: string, newName: string): Promise<
     }
 };
 
-export const deleteEquipmentType = async (id: string): Promise<void> => {
+export const deleteEquipmentType = async (lastName: string): Promise<void> => {
     try {
         await axios.delete(
-            `${API_URL}/equip-type/${id}`,
+            `${API_URL}/equip-type/${lastName}`,
             headers()
         );
     } catch (error: any) {

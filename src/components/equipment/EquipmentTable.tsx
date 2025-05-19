@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 type Equipment = {
@@ -5,6 +6,7 @@ type Equipment = {
   brand: string;
   model: string;
   type: string;
+  department: string;
   serial?: string;
   numberInventory?: string;
 };
@@ -16,6 +18,9 @@ type EquipmentTableProps = {
 };
 
 const EquipmentTable = ({ equipment, onEdit, onDelete }: EquipmentTableProps) => {
+  useEffect(() => {
+    console.log("Equipos recibidos:", equipment);
+  }, [equipment]);
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
       <div className="overflow-x-auto">
@@ -26,6 +31,7 @@ const EquipmentTable = ({ equipment, onEdit, onDelete }: EquipmentTableProps) =>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modelo</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Serial</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventario</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
@@ -39,6 +45,7 @@ const EquipmentTable = ({ equipment, onEdit, onDelete }: EquipmentTableProps) =>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.brand}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.model}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.type}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{item.department}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.serial || '-'}</td>
                   <td className="px-6 py-4 text-sm text-gray-500">{item.numberInventory || '-'}</td>
                   <td className="px-6 py-4 text-right text-sm font-medium">

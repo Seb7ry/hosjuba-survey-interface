@@ -25,6 +25,7 @@ const Equipment = () => {
     brand: '',
     model: '',
     type: '',
+    department: '',
     serial: '',
     numberInventory: ''
   });
@@ -72,6 +73,7 @@ const Equipment = () => {
       brand: '',
       model: '',
       type: '',
+      department: '',
       serial: '',
       numberInventory: ''
     });
@@ -100,6 +102,7 @@ const Equipment = () => {
       brand: equipment.brand,
       model: equipment.model,
       type: equipment.type,
+      department: equipment.department,
       serial: equipment.serial,
       numberInventory: equipment.numberInventory
     });
@@ -117,7 +120,7 @@ const Equipment = () => {
 
   const handleDeleteConfirmed = async () => {
     if (!equipmentToDelete) return;
-    
+
     try {
       await deleteEquipment(equipmentToDelete.name);
       const data = await getAllEquipment();

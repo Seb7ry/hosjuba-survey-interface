@@ -22,11 +22,12 @@ export const useFormPreventive = () => {
             signature: ""
         },
         serviceData: {
+            name: "",
             type: "",
             brand: "",
             model: "",
             serial: "",
-            inventoryNumber: "",
+            numberInventory: "",
             hardware: {
                 limpiezaDeVentiladores: false,
                 limpiezaUnidadesDeAlmacenamiento: false,
@@ -128,10 +129,11 @@ export const useFormCorrective = () => {
             level: "",
             diagnosis: "",
             solution: "",
-            conventions: 0,
+            conventions: "",
             requiresEscalation: false,
             equipments: [{
                 name: "",
+                type: "",
                 brand: "",
                 model: "",
                 serial: "",
@@ -174,7 +176,6 @@ export const serviceCategories = [
     "Traslado e Instalación",
     "Videoconferencia",
 ] as const;
-
 export type ServiceCategory = typeof serviceCategories[number];
 
 export const serviceLevels = [
@@ -183,5 +184,12 @@ export const serviceLevels = [
     "Soporte Nivel 3",
     "ANS Basado en el Servicio",
 ] as const;
-
 export type ServiceLevel = typeof serviceLevels[number];
+
+export const serviceConventions = [
+    "Se encuentra en estado de obsolecencia tecnológica para la entidad.",
+    "Se encuentra en estado inservible, para dar de baja.",
+    "Se encuentra en estado funcionalmente bueno, se sugiere la permanencia del mismo.",
+    "Se encuentra averiado debe ser reparado y/o actualizado.",
+] as const;
+export type ServiceConvention = typeof serviceLevels[number];

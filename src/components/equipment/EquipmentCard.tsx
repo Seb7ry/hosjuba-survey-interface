@@ -5,6 +5,7 @@ type Equipment = {
   brand: string;
   model: string;
   type: string;
+  department: string;
   serial?: string;
   numberInventory?: string;
 };
@@ -43,8 +44,9 @@ const EquipmentCard = ({ equipment, onEdit, onDelete }: EquipmentCardsProps) => 
                 </button>
               </div>
             </div>
-            <div className="mt-2 text-sm">
+            <div className="mt-2 text-sm space-y-1">
               <p><span className="font-medium">Tipo:</span> {item.type}</p>
+              <p><span className="font-medium">Dependencia:</span> {item.department}</p>
               {item.serial && <p><span className="font-medium">Serial:</span> {item.serial}</p>}
               {item.numberInventory && <p><span className="font-medium">N° Inventario:</span> {item.numberInventory}</p>}
             </div>

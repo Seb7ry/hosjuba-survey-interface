@@ -156,7 +156,6 @@ const UserModal = ({
     } as React.ChangeEvent<HTMLInputElement>);
   };
 
-  // Funciones para manejar departamentos
   const handleAddDepartment = () => {
     setDepartmentModalMode('add');
     setCurrentDepartment('');
@@ -227,7 +226,6 @@ const UserModal = ({
     }
   };
 
-  // Funciones para manejar cargos
   const handleAddPosition = () => {
     setPositionModalMode('add');
     setCurrentPosition('');
@@ -321,6 +319,7 @@ const UserModal = ({
               <input
                 type="text"
                 name="name"
+                placeholder='Digite el nombre del Usuario'
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -333,6 +332,7 @@ const UserModal = ({
               <input
                 type="text"
                 name="username"
+                placeholder='Digite el @ que tendrá el Usuario'
                 value={formData.username.toUpperCase()}
                 onChange={(e) => {
                   e.target.value = e.target.value.toUpperCase();
@@ -355,7 +355,7 @@ const UserModal = ({
                 onChange={onInputChange}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                 required={!isEditing}
-                placeholder={isEditing ? "••••••••" : ""}
+                placeholder={isEditing ? "••••••••" : "Digite la contraseña del Usuario"}
               />
               <button
                 type="button"

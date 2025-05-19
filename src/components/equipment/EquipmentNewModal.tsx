@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
-type Equipment = {
-  name: string;
-  brand: string;
-  model: string;
-  type: string;
-  serial?: string;
-  numberInventory?: string;
-};
-
 type EquipmentModalProps = {
   mode: 'add' | 'edit';
   currentName?: string;
