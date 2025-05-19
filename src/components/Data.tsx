@@ -28,6 +28,7 @@ export const useFormPreventive = () => {
             model: "",
             serial: "",
             numberInventory: "",
+            location: "",
             hardware: {
                 limpiezaDeVentiladores: false,
                 limpiezaUnidadesDeAlmacenamiento: false,
@@ -129,7 +130,6 @@ export const useFormCorrective = () => {
             level: "",
             diagnosis: "",
             solution: "",
-            conventions: "",
             requiresEscalation: false,
             equipments: [{
                 name: "",
@@ -187,9 +187,10 @@ export const serviceLevels = [
 export type ServiceLevel = typeof serviceLevels[number];
 
 export const serviceConventions = [
-    "Se encuentra en estado de obsolecencia tecnológica para la entidad.",
-    "Se encuentra en estado inservible, para dar de baja.",
-    "Se encuentra en estado funcionalmente bueno, se sugiere la permanencia del mismo.",
-    "Se encuentra averiado debe ser reparado y/o actualizado.",
+    { classification: "A", text: "Se encuentra en estado de obsolecencia tecnológica para la entidad." },
+    { classification: "B", text: "Se encuentra en estado inservible, para dar de baja." },
+    { classification: "C", text: "Se encuentra en estado funcionalmente bueno, se sugiere la permanencia del mismo." },
+    { classification: "D", text: "Se encuentra averiado debe ser reparado y/o actualizado." },
 ] as const;
-export type ServiceConvention = typeof serviceLevels[number];
+
+export type ServiceConvention = typeof serviceConventions[number]['text'];

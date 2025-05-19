@@ -43,10 +43,10 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                 brand: value ? prev.serviceData.brand : '',
                 model: value ? prev.serviceData.model : '',
                 serial: value ? prev.serviceData.serial : '',
-                inventoryNumber: value ? prev.serviceData.inventoryNumber : ''
+                numberInventory: value ? prev.serviceData.numberInventory : '',
+                location: prev.serviceData.location || ''
             }
         }));
-
 
         if (value.length > 0) {
             const filtered = equipments.filter(equipment =>
@@ -70,7 +70,8 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                 brand: equipment.brand,
                 model: equipment.model,
                 serial: equipment.serial,
-                inventoryNumber: equipment.numberInventory
+                numberInventory: equipment.numberInventory,
+                location: prev.serviceData.location || ''
             }
         }));
         setShowDropdown(false);
@@ -95,6 +96,7 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
             <p className="text-sm text-gray-500 mb-4">Busque y seleccione el equipo</p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
                 {/* Campo de búsqueda de equipo */}
                 <div className="relative md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Equipo*</label>
@@ -166,6 +168,20 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                     <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
                         {formData.serviceData.numberInventory || "No. Inventario del equipo"}
                     </div>
+                </div>
+
+                {/* Nuevo campo para ubicación */}
+                <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación del Equipo</label>
+                    <input
+                        type="text"
+                        name="serviceData.location"
+                        value={formData.serviceData.location || ''}
+                        onChange={handleChange}
+                        placeholder="Ej: Piso 2, Oficina 203"
+                        required
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                    />
                 </div>
 
                 {error && (

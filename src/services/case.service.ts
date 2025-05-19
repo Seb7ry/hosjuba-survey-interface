@@ -26,30 +26,24 @@ export const getCaseByNumber = async (caseNumber: any) => {
 
 export const searchCases = async (filters: any) => {
     try {
-        const queryParams = new URLSearchParams();
+        const cleanFilters = Object.fromEntries(
+            Object.entries(filters).filter(([_, v]) => v !== undefined && v !== '' && v !== null
+        ))
 
-        Object.entries(filters).forEach(([key, value]) => {
-            if (value !== undefined && value !== null && value !== '') {
-                if (value instanceof Date) {
-                    queryParams.append(key, value.toISOString());
-                } else {
-                    queryParams.append(key, String(value));
-                }
-            }
+        const response = await axios.get(`${API_URL}/case`, {
+            ...headers(),
+            params: cleanFilters
         });
-
-        const response = await axios.get(`${API_URL}/case?${queryParams.toString()}`, headers());
+        
         return response.data;
     } catch (error: any) {
         if (error.response) {
-            return error.response.data.message || 'Error al mostrar los casos.';
+            throw new Error(error.response.data.message || 'Error al buscar casos.');
         } else {
-            return 'Error al mostrar los casos.';
+            throw new Error('Error de conexión al buscar casos.');
         }
     }
-
 };
-
 
 export const updateCase = async (id: any, updateData: any) => {
     const response = await axios.put(`${API_URL}/case/${id}`, updateData, headers());

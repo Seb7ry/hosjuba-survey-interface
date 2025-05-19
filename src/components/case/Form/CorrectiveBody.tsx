@@ -9,6 +9,7 @@ interface Equipment {
     type: string;
     serial: string;
     inventoryNumber: string;
+    convention: string;
 }
 
 interface Material {
@@ -40,7 +41,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 const data = await getAllEquipment();
                 setEquipments(data);
                 setFilteredEquipments(data);
-                // Inicializar el array de showDropdowns con false para cada equipo
                 setShowDropdowns(new Array(formData.serviceData.equipments.length).fill(false));
             } catch (err) {
                 setError('Error al cargar los equipos');
@@ -63,7 +63,8 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             model: value ? updatedEquipments[index].model : '',
             type: value ? updatedEquipments[index].type : '',
             serial: value ? updatedEquipments[index].serial : '',
-            inventoryNumber: value ? updatedEquipments[index].inventoryNumber : ''
+            inventoryNumber: value ? updatedEquipments[index].inventoryNumber : '',
+            convention: updatedEquipments[index].convention || '' 
         };
 
         handleChange({
@@ -75,7 +76,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
         if (value.length > 0) {
             const filtered = equipments.filter(equipment =>
-                equipment.type.toLowerCase().includes(value.toLowerCase())
+                equipment.name.toLowerCase().includes(value.toLowerCase())
             );
             setFilteredEquipments(filtered);
 
@@ -94,12 +95,13 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         const updatedEquipments = [...formData.serviceData.equipments];
         updatedEquipments[index] = {
             ...updatedEquipments[index],
-            name: equipment.type,
+            name: equipment.name,
             brand: equipment.brand,
             model: equipment.model,
             type: equipment.type,
             serial: equipment.serial,
-            inventoryNumber: equipment.numberInventory
+            inventoryNumber: equipment.numberInventory,
+            convention: updatedEquipments[index].convention || '' // Mantener el valor de convention
         };
 
         handleChange({
@@ -130,6 +132,22 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         });
     };
 
+    const handleConventionChange = (index: number, e: ChangeEvent<HTMLSelectElement>) => {
+        const { value } = e.target;
+        const updatedEquipments = [...formData.serviceData.equipments];
+        updatedEquipments[index] = {
+            ...updatedEquipments[index],
+            convention: value
+        };
+
+        handleChange({
+            target: {
+                name: "serviceData.equipments",
+                value: updatedEquipments
+            }
+        });
+    };
+
     const addEquipment = () => {
         const newEquipment: Equipment = {
             name: "",
@@ -137,13 +155,14 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             model: "",
             type: "",
             serial: "",
-            inventoryNumber: ""
+            inventoryNumber: "",
+            convention: "" // Añadido campo convention
         };
 
         handleChange({
             target: {
                 name: "serviceData.equipments",
-                value: [...formData.serviceData.equipments, newEquipment]
+                value: [newEquipment, ...formData.serviceData.equipments]
             }
         });
 
@@ -191,7 +210,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         handleChange({
             target: {
                 name: "serviceData.materials",
-                value: [...formData.serviceData.materials, newMaterial]
+                value: [newMaterial, ...formData.serviceData.materials ]
             }
         });
     };
@@ -282,7 +301,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                                 >
                                                     <div className="flex flex-col">
                                                         <span className="font-medium text-sm">{equipmentItem.name}</span>
-                                                        <span className="font-medium text-sm">{equipmentItem.type}</span>
+                                                        <span className="text-gray-500 text-xs">{equipmentItem.type}</span>
                                                         <span className="text-gray-500 text-xs">{equipmentItem.brand}</span>
                                                     </div>
                                                 </li>
@@ -307,6 +326,13 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                 </div>
 
                                 <div className="space-y-1">
+                                    <label className="block text-xs font-medium text-gray-500">Tipo</label>
+                                    <div className="w-full px-2 py-1 text-sm border border-gray-200 rounded bg-gray-50 text-gray-500">
+                                        {equipment.type || "Tipo del equipo"}
+                                    </div>
+                                </div>
+
+                                <div className="space-y-1">
                                     <label className="block text-xs font-medium text-gray-500">Serial</label>
                                     <div className="w-full px-2 py-1 text-sm border border-gray-200 rounded bg-gray-50 text-gray-500">
                                         {equipment.serial || "Serial del equipo"}
@@ -321,18 +347,22 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                 </div>
 
                                 <div className="space-y-1">
-                                    <label className="block text-sm font-medium text-gray-500 mb-1">Convenciones*</label>
+                                    <label className="block text-xs font-medium text-gray-500">Convención*</label>
                                     <select
-                                        name="serviceData.level"
-                                        value={formData.serviceData.level}
-                                        onChange={handleChange}
+                                        name={`convention-${index}`}
+                                        value={equipment.convention || ''}
+                                        onChange={(e) => handleConventionChange(index, e)}
                                         required
-                                        className="w-full px-2 py-1 text-sm border border-gray-200 rounded shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                                        className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:ring-indigo-500 focus:border-indigo-500"
                                     >
                                         <option value="">Seleccione...</option>
                                         {serviceConventions.map((convention) => (
-                                            <option key={convention} value={convention}>
-                                                {convention}
+                                            <option 
+                                                key={convention.text} 
+                                                value={convention.text}
+                                                title={convention.text}
+                                            >
+                                                {convention.classification} | {convention.text}
                                             </option>
                                         ))}
                                     </select>
@@ -343,7 +373,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 </div>
             </div>
 
-            {/* Sección de Materiales (se mantiene igual) */}
+            {/* Sección de Materiales */}
             <div>
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-lg font-medium text-gray-700">Materiales Utilizados</h2>

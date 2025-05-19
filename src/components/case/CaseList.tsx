@@ -15,6 +15,8 @@ export type Case = {
     fechaReporte: string;
     funcionario: string;
     prioridad?: string;
+    equipo: string;
+    tecnico: string;
 };
 
 interface CaseListProps {
@@ -31,6 +33,9 @@ type QueryFilters = {
     status?: string;
     startDate?: string;
     endDate?: string;
+    technicianName?: string;
+    equipmentName?: string;
+    dependency?: string;
     [key: string]: any;
 };
 
@@ -64,11 +69,14 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             const queryFilters: QueryFilters = {
                 typeCase: typeCase,
                 priority: filters.priority,
-                reportedByName: filters.reportedBy,
+                reportedByName: filters.reportedByName, 
                 caseNumber: filters.caseNumber,
                 status: filters.status,
                 startDate: filters.startDate,
-                endDate: filters.endDate
+                endDate: filters.endDate,
+                technicianName: filters.technicianName, 
+                equipmentName: filters.equipmentName,   
+                dependency: filters.dependency         
             };
 
             (Object.keys(queryFilters) as Array<keyof QueryFilters>).forEach(key => {
@@ -86,12 +94,14 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                 estado: item.status || "Pendiente",
                 fechaReporte: item.reportedAt || item.createdAt,
                 funcionario: item.reportedBy?.name || "Sin especificar",
-                prioridad: item.serviceData?.priority
+                prioridad: item.serviceData?.priority,
+                tecnico: item.assignedTechnician.name,
             }));
 
             setCases(mappedCases);
             setTotalPages(Math.ceil(mappedCases.length / ITEMS_PER_PAGE));
             setCurrentPage(1);
+            console.log('Items')
         } catch (err) {
             console.error("Error al cargar casos:", err);
             setError("No se pudieron cargar los casos. Intente nuevamente.");
@@ -192,7 +202,6 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                         <thead>
                             <tr className="bg-gray-50 text-gray-600 text-sm">
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Equipo</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
                                 {hasPriority && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
@@ -209,8 +218,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                         className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
                                     >
                                         <td className="px-6 py-4 font-medium">{item.numero}</td>
-                                        <td className="px-6 py-4">{item.dependencia}</td>
-                                        <td className="px-6 py-4">{item.dependencia}</td>
+                                        <td className="px-6 py-4">{item.tecnico}</td>
                                         <td className="px-6 py-4">{item.dependencia}</td>
                                         {hasPriority && (
                                             <td className="px-6 py-4">
@@ -227,7 +235,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
-                                        
+
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center space-x-4">
                                                 <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
