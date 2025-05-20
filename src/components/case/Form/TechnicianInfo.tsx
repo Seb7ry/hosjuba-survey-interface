@@ -37,7 +37,6 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
             setIsLoading(true);
             try {
                 const data = await getAllUsers();
-                console.log(data)
                 const filteredUsers = data.filter(user =>
                     user.position?.toLowerCase().includes('técnico') ||
                     user.department?.toLowerCase().includes('mantenimiento') ||
@@ -249,7 +248,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
                                     onClick={() => selectTechnician(user)}
                                 >
                                     <div className="flex flex-col">
-                                        <span className="font-medium">{user.username}</span>
+                                        <span className="font-medium">@{user.username}</span>
                                         <span className="text-gray-500">{user.name}</span>
                                     </div>
                                 </li>
@@ -285,7 +284,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
                                 >
                                     <div className="flex flex-col">
                                         <span className="font-medium">{user.name}</span>
-                                        <span className="text-gray-500">{user.username}</span>
+                                        <span className="text-gray-500">@{user.username}</span>
                                     </div>
                                 </li>
                             ))}

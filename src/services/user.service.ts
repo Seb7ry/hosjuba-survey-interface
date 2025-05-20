@@ -60,9 +60,12 @@ export const updateUser = async (userData: UserData): Promise<UserData> => {
       position: userData.position,
       signature: userData.signature
     }, headers());
-    sessionStorage.setItem('name', response.data.name);
-    sessionStorage.setItem('department', response.data.department);
-    sessionStorage.setItem('position', response.data.position);
+    if (userData.username === sessionStorage.getItem('username')) {
+      sessionStorage.setItem('name', response.data.name);
+      sessionStorage.setItem('department', response.data.department);
+      sessionStorage.setItem('position', response.data.position);
+    }
+
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al actualizar el usuario.');

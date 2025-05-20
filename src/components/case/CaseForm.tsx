@@ -82,7 +82,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
     try {
       let updatedOrCreatedCase;
-
+      
       if (isEditMode && numberCase) {
         updatedOrCreatedCase = await updateCase(numberCase, formData);
       } else {

@@ -85,7 +85,7 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
     <div className="mb-8">
       <h2 className="text-xl font-medium text-gray-700 mb-4 border-b pb-2">Quien Reporta</h2>
       <p className="text-sm text-gray-500 mb-4">Puede buscar al usuario por su @Username o por Nombre</p>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Campo de búsqueda por ID */}
         <div className="relative">
@@ -183,12 +183,12 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
       </div>
 
       {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
-      {(showDropdownById || showDropdownByName) && 
-       filteredUsersById.length === 0 && 
-       filteredUsersByName.length === 0 && 
-       !isLoading && (
-        <p className="mt-1 text-sm text-gray-500">No se encontraron usuarios</p>
-      )}
+      {(showDropdownById || showDropdownByName) &&
+        filteredUsersById.length === 0 &&
+        filteredUsersByName.length === 0 &&
+        !isLoading && (
+          <p className="mt-1 text-sm text-gray-500">No se encontraron usuarios</p>
+        )}
     </div>
   );
 };
