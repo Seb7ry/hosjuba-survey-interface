@@ -37,9 +37,15 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
             setIsLoading(true);
             try {
                 const data = await getAllUsers();
-                setUsers(data);
-                setFilteredUsersById(data);
-                setFilteredUsersByName(data);
+                console.log(data)
+                const filteredUsers = data.filter(user =>
+                    user.position?.toLowerCase().includes('técnico') ||
+                    user.department?.toLowerCase().includes('mantenimiento') ||
+                    user.department?.toLowerCase().includes('sistemas')
+                );
+                setUsers(filteredUsers);
+                setFilteredUsersById(filteredUsers);
+                setFilteredUsersByName(filteredUsers);
             } catch (err) {
                 showError('Error al cargar los técnicos');
             } finally {

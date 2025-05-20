@@ -28,13 +28,13 @@ export const searchCases = async (filters: any) => {
     try {
         const cleanFilters = Object.fromEntries(
             Object.entries(filters).filter(([_, v]) => v !== undefined && v !== '' && v !== null
-        ))
+            ))
 
         const response = await axios.get(`${API_URL}/case`, {
             ...headers(),
             params: cleanFilters
         });
-        
+
         return response.data;
     } catch (error: any) {
         if (error.response) {

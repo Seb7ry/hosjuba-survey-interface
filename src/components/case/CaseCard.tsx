@@ -2,29 +2,44 @@ import { FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import type { Case } from "./CaseList";
 import { formatDateTime, getStatusStyles, getPriorityStyles } from "../Utils";
 import { ErrorMessage } from "../ErrorMessage";
+import { useNavigate } from "react-router-dom";
 
 type CaseCardsProps = {
     cases: Case[];
     onDelete: (caseId: string) => void;
+    onEdit?: (caseId: string) => void;
     isDeleting: boolean;
     error?: string;
     onErrorClose?: () => void;
+    typeCase: "Mantenimiento" | "Preventivo";  // <-- agregamos este prop
 };
 
-const CaseCards = ({ 
-    cases, 
-    onDelete, 
+const CaseCards = ({
+    cases,
+    onDelete,
     isDeleting,
     error,
-    onErrorClose 
+    onErrorClose,
+    typeCase,  // <-- recibimos aquí
 }: CaseCardsProps) => {
+
+    const navigate = useNavigate();
+
+    const handleEditClick = (numero: string) => {
+        if (typeCase === "Mantenimiento") {
+            navigate(`/corrective/edit/${numero}`);
+        } else {
+            navigate(`/preventive/edit/${numero}`);
+        }
+    };
+
     return (
         <div className="space-y-3">
             {error && onErrorClose && (
                 <div className="mb-4">
-                    <ErrorMessage 
-                        message={error} 
-                        onClose={onErrorClose} 
+                    <ErrorMessage
+                        message={error}
+                        onClose={onErrorClose}
                     />
                 </div>
             )}
@@ -64,10 +79,14 @@ const CaseCards = ({
                             <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
                                 <FaEye className="w-4 h-4" />
                             </button>
-                            <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
+                            <button
+                                className="text-blue-600 hover:text-blue-900 transition-colors"
+                                title="Editar"
+                                onClick={() => handleEditClick(item.numero)}
+                            >
                                 <FaEdit className="w-4 h-4" />
                             </button>
-                            <button 
+                            <button
                                 className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 title="Eliminar"
                                 onClick={() => onDelete(item.numero)}

@@ -37,10 +37,15 @@ function App() {
           <Route path="/user" element={<User />} />
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/case" element={<Case />} />
+          
           <Route path="/corrective" element={<Corrective />} />
           <Route path="/corrective/new" element={<CaseForm isPreventive={false} />} />
+          <Route path="/corrective/edit/:numberCase" element={<CaseForm isPreventive={false} />} />
+
           <Route path="/preventive" element={<Preventive />} />
           <Route path="/preventive/new" element={<CaseForm isPreventive={true} />} />
+          <Route path="/preventive/edit/:numberCase" element={<CaseForm isPreventive={true} />} />
+
         </Route>
       </Routes>
 

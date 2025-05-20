@@ -19,7 +19,6 @@ type EquipmentTableProps = {
 
 const EquipmentTable = ({ equipment, onEdit, onDelete }: EquipmentTableProps) => {
   useEffect(() => {
-    console.log("Equipos recibidos:", equipment);
   }, [equipment]);
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">

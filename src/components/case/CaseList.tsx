@@ -6,6 +6,7 @@ import CaseFilter, { type CaseFilters } from "./CaseFilter";
 import { formatDateTime, getStatusStyles, getPriorityStyles } from "../Utils";
 import ConfirmDialog from "../ConfirmDialog";
 import { ErrorMessage } from "../ErrorMessage";
+import { useNavigate } from "react-router-dom";
 
 export type Case = {
     id: string;
@@ -69,14 +70,14 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             const queryFilters: QueryFilters = {
                 typeCase: typeCase,
                 priority: filters.priority,
-                reportedByName: filters.reportedByName, 
+                reportedByName: filters.reportedByName,
                 caseNumber: filters.caseNumber,
                 status: filters.status,
                 startDate: filters.startDate,
                 endDate: filters.endDate,
-                technicianName: filters.technicianName, 
-                equipmentName: filters.equipmentName,   
-                dependency: filters.dependency         
+                technicianName: filters.technicianName,
+                equipmentName: filters.equipmentName,
+                dependency: filters.dependency
             };
 
             (Object.keys(queryFilters) as Array<keyof QueryFilters>).forEach(key => {
@@ -101,7 +102,6 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             setCases(mappedCases);
             setTotalPages(Math.ceil(mappedCases.length / ITEMS_PER_PAGE));
             setCurrentPage(1);
-            console.log('Items')
         } catch (err) {
             console.error("Error al cargar casos:", err);
             setError("No se pudieron cargar los casos. Intente nuevamente.");
@@ -162,6 +162,10 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         setCaseToDelete(null);
     };
 
+    const paginatedCases = getPaginatedCases();
+    const hasPriority = cases.some(caseItem => caseItem.prioridad);
+    const navigate = useNavigate();
+
     if (loading && cases.length === 0) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -169,10 +173,6 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             </div>
         );
     }
-
-    const paginatedCases = getPaginatedCases();
-    const hasPriority = cases.some(caseItem => caseItem.prioridad);
-
     return (
         <div className="space-y-4">
             {showError && error && (
@@ -241,9 +241,22 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                                 <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
                                                     <FaEye className="w-4 h-4" />
                                                 </button>
-                                                <button className="text-blue-600 hover:text-blue-900 transition-colors" title="Editar">
-                                                    <FaEdit className="w-4 h-4" />
-                                                </button>
+                                                {hasPriority &&
+                                                    <button
+                                                        onClick={() => navigate(`/corrective/edit/${item.numero}`)}
+                                                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                                                        title="Editar">
+                                                        <FaEdit className="w-4 h-4" />
+                                                    </button>}
+
+                                                {!hasPriority &&
+                                                    <button
+                                                        onClick={() => navigate(`/preventive/edit/${item.numero}`)}
+                                                        className="text-blue-600 hover:text-blue-900 transition-colors"
+                                                        title="Editar">
+                                                        <FaEdit className="w-4 h-4" />
+                                                    </button>}
+
                                                 <button
                                                     className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     title="Eliminar"
@@ -273,6 +286,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     isDeleting={isDeleting}
                     error={error || undefined}
                     onErrorClose={() => setShowError(false)}
+                    typeCase={typeCase} 
                 />
             )}
 

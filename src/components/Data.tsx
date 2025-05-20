@@ -21,6 +21,12 @@ export const useFormPreventive = () => {
             position: "",
             signature: ""
         },
+        effectivenessRating: {
+            value: 1
+        },
+        satisfactionRating: {
+            value: 1
+        },
         serviceData: {
             name: "",
             type: "",
@@ -121,8 +127,14 @@ export const useFormCorrective = () => {
             position: "",
             signature: ""
         },
+        effectivenessRating: {
+            value: 1
+        },
+        satisfactionRating: {
+            value: 1
+        },
         serviceData: {
-            description:"",
+            description: "",
             attendedAt: "",
             solvedAt: "",
             priority: "",
@@ -131,6 +143,12 @@ export const useFormCorrective = () => {
             diagnosis: "",
             solution: "",
             requiresEscalation: false,
+            escalationTechnician: {
+                _id: "",
+                name: "",
+                position: "",
+                signature: ""
+            },
             equipments: [{
                 name: "",
                 type: "",

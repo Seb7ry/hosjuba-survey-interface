@@ -34,7 +34,6 @@ const Sidebar = () => {
     { label: "Equipos", icon: <Monitor size={20} />, path: "/equipment" },
     { label: "Casos", icon: <ClipboardList size={20} />, path: "/case" },
     { label: "Reportes", icon: <BarChart2 size={20} />, path: "/report" },
-    { label: "Historial", icon: <BookOpen size={20} />, path: "/history" },
   ];
 
   return (

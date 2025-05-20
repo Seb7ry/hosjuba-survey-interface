@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { createCase } from "../../services/case.service";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { createCase, getCaseByNumber, updateCase } from "../../services/case.service";
+import { useNavigate, useParams } from "react-router-dom";
 import Sidebar from "../Sidebar";
 import { useFormPreventive, useFormCorrective } from "../Data";
 import type { CustomChangeEvent } from "./form/BodyForm";
@@ -23,6 +23,25 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [createdCaseNumber, setCreatedCaseNumber] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { numberCase } = useParams();
+  const isEditMode = !!numberCase && !numberCase.includes("new");
+
+  useEffect(() => {
+    const loadCase = async () => {
+      if (isEditMode && numberCase) {
+        try {
+          const caseData = await getCaseByNumber(numberCase);
+          setFormData(caseData);
+        } catch (err) {
+          console.error("Error al cargar el caso:", err);
+          alert("No se pudo cargar el caso para editar.");
+        }
+      }
+    };
+
+    loadCase();
+  }, [isEditMode, numberCase, setFormData]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | CustomChangeEvent
@@ -57,27 +76,28 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
     setShowConfirmDialog(true);
   };
 
-  const confirmCreateCase = async () => {
+  const confirmSubmitCase = async () => {
     setShowConfirmDialog(false);
     setIsSubmitting(true);
 
     try {
-      console.log("Datos que se enviarán al backend:", formData); // 👈 Agrega esto
-      console.log("Payload enviado:", JSON.stringify(formData, null, 2));
+      let updatedOrCreatedCase;
 
-      const createdCase = await createCase(formData);
-      
-      console.log("Respuesta del backend:", createdCase);
-      setCreatedCaseNumber(createdCase.caseNumber);
+      if (isEditMode && numberCase) {
+        updatedOrCreatedCase = await updateCase(numberCase, formData);
+      } else {
+        updatedOrCreatedCase = await createCase(formData);
+      }
+
+      setCreatedCaseNumber(updatedOrCreatedCase.caseNumber);
       setShowSuccessDialog(true);
     } catch (error: any) {
-      console.error("Error creating case:", error);
-      alert('Error al crear el caso. Por favor intente nuevamente.');
+      console.error("Error al guardar el caso:", error);
+      alert('Error al guardar el caso. Por favor intente nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
   };
-
 
   const handleSuccessDialogClose = () => {
     setShowSuccessDialog(false);
@@ -95,7 +115,13 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
         <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
           <h1 className="text-3xl font-semibold text-gray-800 mb-6 tracking-tight">
-            {isPreventive ? 'Nuevo Caso Preventivo' : 'Nuevo Caso de Mantenimiento'}
+            {isEditMode
+              ? isPreventive
+                ? 'Editar Caso Preventivo'
+                : 'Editar Caso de Mantenimiento'
+              : isPreventive
+                ? 'Nuevo Caso Preventivo'
+                : 'Nuevo Caso de Mantenimiento'}
           </h1>
 
           <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -133,7 +159,13 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
                     Procesando...
                   </span>
                 ) : (
-                  isPreventive ? 'Crear Caso Preventivo' : 'Crear Caso de Mantenimiento'
+                  isEditMode
+                    ? isPreventive
+                      ? 'Guardar Cambios (Preventivo)'
+                      : 'Guardar Cambios (Correctivo)'
+                    : isPreventive
+                      ? 'Crear Caso Preventivo'
+                      : 'Crear Caso de Mantenimiento'
                 )}
               </button>
             </div>
@@ -143,9 +175,11 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
       <ConfirmDialog
         isOpen={showConfirmDialog}
-        message="¿Estás seguro que deseas crear este caso?"
+        message={isEditMode
+          ? "¿Estás seguro que deseas guardar los cambios en este caso?"
+          : "¿Estás seguro que deseas crear este caso?"}
         onCancel={() => setShowConfirmDialog(false)}
-        onConfirm={confirmCreateCase}
+        onConfirm={confirmSubmitCase}
         isProcessing={isSubmitting}
       />
 

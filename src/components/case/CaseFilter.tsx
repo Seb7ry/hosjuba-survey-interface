@@ -38,7 +38,6 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
         dependency: ""
     });
 
-    // Estados para los dropdowns de búsqueda
     const [users, setUsers] = useState<UserData[]>([]);
     const [filteredTechnicians, setFilteredTechnicians] = useState<UserData[]>([]);
     const [equipments, setEquipments] = useState<EquipmentResponse[]>([]);
@@ -63,8 +62,13 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
             try {
                 // Cargar usuarios (para técnicos)
                 const usersData = await getAllUsers();
-                setUsers(usersData);
-                setFilteredTechnicians(usersData);
+                const filteredUsers = usersData.filter(user =>
+                    user.position?.toLowerCase().includes('técnico') ||
+                    user.department?.toLowerCase().includes('mantenimiento') ||
+                    user.department?.toLowerCase().includes('sistemas')
+                );
+                setUsers(filteredUsers);
+                setFilteredTechnicians(filteredUsers);
                 
                 // Cargar equipos
                 const equipmentsData = await getAllEquipment();

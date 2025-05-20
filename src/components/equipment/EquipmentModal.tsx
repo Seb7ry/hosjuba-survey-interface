@@ -71,13 +71,6 @@ const EquipmentModal = ({
     }
   }, [isOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      console.log('formData.department al abrir modal:', formData.department);
-    }
-  }, [isOpen, formData.department]);
-
-
   const loadEquipmentTypes = async () => {
     try {
       setLoadingTypes(true);
@@ -132,7 +125,6 @@ const EquipmentModal = ({
   const handleConfirm = async () => {
     setShowConfirm(false);
     try {
-      console.log("Datos a enviar:", formData);
       await onSubmit(formData);
     } catch (err: any) {
       setError(err.message);
