@@ -11,6 +11,7 @@ import Corrective from "./components/case/Corrective";
 import Preventive from "./components/case/Preventive";
 import CaseForm from "./components/case/CaseForm";
 import Equipment from "./pages/Equipment";
+import Report from "./pages/Report";
 
 if (typeof window !== 'undefined' && document.getElementById('root')) {
   Modal.setAppElement('#root');
@@ -37,7 +38,7 @@ function App() {
           <Route path="/user" element={<User />} />
           <Route path="/equipment" element={<Equipment />} />
           <Route path="/case" element={<Case />} />
-          
+
           <Route path="/corrective" element={<Corrective />} />
           <Route path="/corrective/new" element={<CaseForm isPreventive={false} />} />
           <Route path="/corrective/edit/:numberCase" element={<CaseForm isPreventive={false} />} />
@@ -46,6 +47,7 @@ function App() {
           <Route path="/preventive/new" element={<CaseForm isPreventive={true} />} />
           <Route path="/preventive/edit/:numberCase" element={<CaseForm isPreventive={true} />} />
 
+          <Route path="/report" element={<Report />} />
         </Route>
       </Routes>
 
