@@ -39,7 +39,7 @@ const Sidebar = () => {
   return (
     <>
       {!open && (
-        <div className="fixed top-4 left-4 z-40 md:hidden flex gap-2">
+        <div className="fixed top-4 left-4 z-50 md:hidden flex gap-2">
           <button
             onClick={() => setOpen(true)}
             className="p-2 bg-white text-gray-800 rounded-md shadow-md hover:bg-gray-100 transition-colors duration-200"
@@ -59,7 +59,7 @@ const Sidebar = () => {
       )}
 
       <div
-        className={`fixed top-0 left-0 w-64 h-screen bg-white border-r border-gray-200 z-40 transition-transform duration-300 ease-in-out
+        className={`fixed top-0 left-0 w-64 h-screen bg-white border-r border-gray-200 z-50 transition-transform duration-300 ease-in-out
         ${open ? "translate-x-0 shadow-xl" : "-translate-x-full"}
         md:translate-x-0 md:shadow-none`}
       >
