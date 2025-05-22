@@ -1,13 +1,23 @@
 import { useEffect, useState } from 'react';
-import { Download, Search, Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { ErrorMessage } from '../components/ErrorMessage';
+import { generateReport, type TimeInterval as ApiTimeInterval, type ReportType } from '../services/report.service';
+import SuccessDialog from '../components/SuccessDialog'; // Asegúrate de importar correctamente
+
+const intervalMap: Record<TimeInterval, ApiTimeInterval> = {
+    daily: 'mensual',
+    weekly: 'semestral',
+    monthly: 'mensual',
+    yearly: 'anual',
+    custom: 'personalizado'
+};
 
 type TimeInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
-type ReportType = 'Mantenimiento' | 'Preventivo';
 
 const Report = () => {
     const [loading, setLoading] = useState(false);
+    const [progress, setProgress] = useState(0);
     const [error, setError] = useState('');
     const [reportType, setReportType] = useState<ReportType>('Mantenimiento');
     const [interval, setInterval] = useState<TimeInterval>('monthly');
@@ -15,7 +25,7 @@ const Report = () => {
     const [month, setMonth] = useState<string>((new Date().getMonth() + 1).toString());
     const [startDate, setStartDate] = useState<string>('');
     const [endDate, setEndDate] = useState<string>('');
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+    const [dialogOpen, setDialogOpen] = useState(false);
 
     useEffect(() => {
         if (error) {
@@ -25,45 +35,50 @@ const Report = () => {
     }, [error]);
 
     useEffect(() => {
-        const handleResize = () => setWindowWidth(window.innerWidth);
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        let intervalId: number | undefined;
+        if (loading) {
+            setProgress(0);
+            intervalId = window.setInterval(() => {
+                setProgress((prev) => {
+                    if (prev >= 90) return prev;
+                    return prev + 10;
+                });
+            }, 300);
+        } else {
+            setProgress(100);
+        }
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [loading]);
 
     const handleGenerateReport = async () => {
         setLoading(true);
         setError('');
-
         try {
-            // Validaciones básicas
             if (interval === 'custom' && (!startDate || !endDate)) {
                 throw new Error('Para intervalo personalizado, debe especificar fechas de inicio y fin');
             }
 
-            // Construir query params
-            const params = new URLSearchParams();
-            params.append('type', reportType);
-            params.append('interval', interval);
+            const startDateObj = startDate ? new Date(startDate) : undefined;
+            const endDateObj = endDate ? new Date(endDate) : undefined;
 
-            if (year) params.append('year', year);
-            if (month) params.append('month', month);
-            if (startDate) params.append('startDate', startDate);
-            if (endDate) params.append('endDate', endDate);
+            const apiInterval = intervalMap[interval];
 
-            // Aquí implementarías la llamada al endpoint
-            // const response = await fetch(`/api/reports/generate?${params.toString()}`);
-            // const blob = await response.blob();
-            // Crear enlace de descarga...
+            await generateReport({
+                type: reportType,
+                interval: apiInterval,
+                year: interval === 'yearly' || interval === 'monthly' ? parseInt(year) : undefined,
+                month: interval === 'monthly' ? parseInt(month) : undefined,
+                startDate: interval === 'custom' ? startDateObj : undefined,
+                endDate: interval === 'custom' ? endDateObj : undefined
+            });
 
-            // Simulación de éxito (remover en implementación real)
-            console.log('Generando reporte con parámetros:', params.toString());
-            setTimeout(() => {
-                setLoading(false);
-                alert('Reporte generado con éxito (simulación)');
-            }, 1500);
+            setDialogOpen(true);
 
         } catch (err: any) {
-            setError(err.message);
+            setError(err.message || 'Error al generar el reporte');
+        } finally {
             setLoading(false);
         }
     };
@@ -105,11 +120,15 @@ const Report = () => {
                                 value={month}
                                 onChange={(e) => setMonth(e.target.value)}
                             >
-                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                                    <option key={m} value={m}>
-                                        {new Date(2000, m - 1, 1).toLocaleString('default', { month: 'long' })}
-                                    </option>
-                                ))}
+                                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => {
+                                    const monthName = new Date(2000, m - 1, 1).toLocaleString('default', { month: 'long' });
+                                    const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                                    return (
+                                        <option key={m} value={m}>
+                                            {capitalizedMonth}
+                                        </option>
+                                    );
+                                })}
                             </select>
                         </div>
                     </>
@@ -124,6 +143,7 @@ const Report = () => {
                                 className="w-full p-2 border border-gray-300 rounded-md"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
+                                max={endDate || new Date().toISOString().split('T')[0]}
                             />
                         </div>
                         <div className="mb-4">
@@ -133,6 +153,8 @@ const Report = () => {
                                 className="w-full p-2 border border-gray-300 rounded-md"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
+                                min={startDate}
+                                max={new Date().toISOString().split('T')[0]}
                             />
                         </div>
                     </>
@@ -145,6 +167,13 @@ const Report = () => {
     return (
         <div className="flex min-h-screen bg-gray-50 relative">
             {error && <ErrorMessage message={error} onClose={() => setError('')} />}
+            <SuccessDialog
+                isOpen={dialogOpen}
+                message="Reporte generado exitosamente"
+                label="Tipo de reporte"
+                caseNumber={reportType}
+                onClose={() => setDialogOpen(false)}
+            />
 
             <div className="md:block md:w-64 flex-shrink-0">
                 <Sidebar />
@@ -152,36 +181,33 @@ const Report = () => {
 
             <main className="flex-1 min-w-0">
                 <div className="h-16 md:h-0" />
-
                 <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                        <h1 className="text-3xl font-semibold text-gray-800">Generación de Reportes</h1>
+                        <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">Generación de Reportes</h1>
                     </div>
 
-                    <div className="bg-white rounded-lg shadow overflow-hidden p-6">
+                    <div className="bg-white rounded-lg shadow overflow-hidden p-4 sm:p-6">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Reporte</label>
                                     <select
-                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        className="w-full p-2 border border-gray-300 rounded-md text-sm sm:text-base"
                                         value={reportType}
                                         onChange={(e) => setReportType(e.target.value as ReportType)}
                                     >
-                                        <option value="Mantenimiento">Mantenimiento</option>
-                                        <option value="Preventivo">Preventivo</option>
+                                        <option value="Mantenimiento">Mantenimientos Correctivos</option>
+                                        <option value="Preventivo">Mantenimientos Preventivos</option>
                                     </select>
                                 </div>
 
                                 <div className="mb-4">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Intervalo</label>
                                     <select
-                                        className="w-full p-2 border border-gray-300 rounded-md"
+                                        className="w-full p-2 border border-gray-300 rounded-md text-sm sm:text-base"
                                         value={interval}
                                         onChange={(e) => setInterval(e.target.value as TimeInterval)}
                                     >
-                                        <option value="daily">Diario</option>
-                                        <option value="weekly">Semanal</option>
                                         <option value="monthly">Mensual</option>
                                         <option value="yearly">Anual</option>
                                         <option value="custom">Personalizado</option>
@@ -191,34 +217,35 @@ const Report = () => {
                                 {renderDateInputs()}
                             </div>
 
-                            <div className="flex flex-col justify-between">
-                                <div className="bg-gray-50 p-4 rounded-md h-full flex items-center justify-center">
-                                    <div className="text-center">
-                                        <Download className="h-12 w-12 text-gray-400 mx-auto mb-2" />
-                                        <p className="text-gray-500">Configura los parámetros y genera tu reporte</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            {/* Panel de descarga con botón grande */}
+                            <div className="flex flex-col justify-center items-center">
+                                <button
+                                    onClick={handleGenerateReport}
+                                    disabled={loading}
+                                    title="Generar Reporte"
+                                    className={`bg-gray-100 hover:bg-gray-200 transition-colors rounded-full w-24 h-24 flex items-center justify-center shadow 
+                    ${loading ? 'cursor-not-allowed opacity-50' : ''}`}
+                                >
+                                    {loading ? (
+                                        <Loader2 className="h-10 w-10 text-gray-500 animate-spin" />
+                                    ) : (
+                                        <Download className="h-10 w-10 text-blue-600" />
+                                    )}
+                                </button>
+                                <p className="text-center mt-3 text-gray-600 text-sm">
+                                    {loading ? 'Generando...' : 'Descargar Reporte'}
+                                </p>
 
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                onClick={handleGenerateReport}
-                                disabled={loading}
-                                className="flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:bg-blue-300"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Generando...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Download className="mr-2 h-4 w-4" />
-                                        Generar Reporte
-                                    </>
+                                {/* Barra de progreso */}
+                                {loading && (
+                                    <div className="w-48 h-2 bg-gray-200 rounded-full mt-4">
+                                        <div
+                                            className="h-2 bg-blue-500 rounded-full transition-all"
+                                            style={{ width: `${progress}%` }}
+                                        />
+                                    </div>
                                 )}
-                            </button>
+                            </div>
                         </div>
                     </div>
                 </div>
