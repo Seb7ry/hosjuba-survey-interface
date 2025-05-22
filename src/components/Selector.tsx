@@ -22,6 +22,13 @@ export const Selector = ({
   onDelete,
 }: SelectorProps) => {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [, setShowSuccess] = useState(false);
+
+  const handleDelete = async () => {
+    onDelete();
+    setShowConfirm(false);
+    setShowSuccess(true);
+  };
 
   return (
     <div className="flex flex-col sm:flex-row gap-2">
@@ -79,12 +86,9 @@ export const Selector = ({
 
       <ConfirmDialog
         isOpen={showConfirm}
-        message="¿Estás seguro de eliminar este elemento?"
+        message="¿Estás seguro que deseas eliminar este elemento? Esta acción no se puede deshacer."
         onCancel={() => setShowConfirm(false)}
-        onConfirm={() => {
-          setShowConfirm(false);
-          onDelete();
-        }}
+        onConfirm={handleDelete}
       />
     </div>
   );

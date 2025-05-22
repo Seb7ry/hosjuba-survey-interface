@@ -6,7 +6,6 @@ import {
   Home,
   User,
   ClipboardList,
-  BookOpen,
   BarChart2,
   ChevronLeft,
   Monitor,

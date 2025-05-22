@@ -7,6 +7,7 @@ import { formatDateTime, getStatusStyles, getPriorityStyles } from "../Utils";
 import ConfirmDialog from "../ConfirmDialog";
 import { ErrorMessage } from "../ErrorMessage";
 import { useNavigate } from "react-router-dom";
+import SuccessDialog from "../SuccessDialog";
 
 export type Case = {
     id: string;
@@ -51,6 +52,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     const [caseToDelete, setCaseToDelete] = useState<string | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showError, setShowError] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
         const handleResize = () => {
@@ -136,6 +138,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
     const handleDeleteClick = (caseId: string) => {
         setCaseToDelete(caseId);
+        setShowSuccess(false);
         setShowConfirmDialog(true);
     };
 
@@ -146,6 +149,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             setIsDeleting(true);
             await deleteCase(caseToDelete);
             await loadCases();
+            setShowSuccess(true);
         } catch (err) {
             console.error("Error al eliminar caso:", err);
             setError("No se pudo eliminar el caso. Intente nuevamente.");
@@ -160,6 +164,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     const handleCancelDelete = () => {
         setShowConfirmDialog(false);
         setCaseToDelete(null);
+        setShowSuccess(false);
     };
 
     const paginatedCases = getPaginatedCases();
@@ -188,6 +193,12 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                 onCancel={handleCancelDelete}
                 onConfirm={handleConfirmDelete}
                 isProcessing={isDeleting}
+            />
+
+            <SuccessDialog
+                isOpen={showSuccess}
+                message="El caso fue eliminado correctamente."
+                onClose={() => setShowSuccess(false)}
             />
 
             <CaseFilter
@@ -286,7 +297,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     isDeleting={isDeleting}
                     error={error || undefined}
                     onErrorClose={() => setShowError(false)}
-                    typeCase={typeCase} 
+                    typeCase={typeCase}
                 />
             )}
 

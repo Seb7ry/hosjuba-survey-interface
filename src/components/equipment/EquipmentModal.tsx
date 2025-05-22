@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import ConfirmDialog from '../ConfirmDialog';
 import {
@@ -427,7 +427,9 @@ const EquipmentModal = ({
 
       <ConfirmDialog
         isOpen={showConfirm}
-        message={isEditing ? "¿Estás seguro de actualizar este equipo?" : "¿Estás seguro de crear este equipo?"}
+        message={isEditing
+          ? "¿Estás seguro de actualizar este equipo?"
+          : "¿Estás seguro de crear este equipo?"}
         onCancel={() => setShowConfirm(false)}
         onConfirm={handleConfirm}
       />

@@ -11,7 +11,7 @@ type CaseCardsProps = {
     isDeleting: boolean;
     error?: string;
     onErrorClose?: () => void;
-    typeCase: "Mantenimiento" | "Preventivo";  // <-- agregamos este prop
+    typeCase: "Mantenimiento" | "Preventivo"; 
 };
 
 const CaseCards = ({
@@ -20,7 +20,7 @@ const CaseCards = ({
     isDeleting,
     error,
     onErrorClose,
-    typeCase,  // <-- recibimos aquí
+    typeCase,
 }: CaseCardsProps) => {
 
     const navigate = useNavigate();

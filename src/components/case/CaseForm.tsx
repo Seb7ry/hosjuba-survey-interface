@@ -185,6 +185,10 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
       <SuccessDialog
         isOpen={showSuccessDialog}
+        message={isEditMode
+          ? `El caso fue editado correctamente.`
+          : `El caso fue creado correctamente.`
+        }
         caseNumber={createdCaseNumber}
         onClose={handleSuccessDialogClose}
       />

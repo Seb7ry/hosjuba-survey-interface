@@ -3,17 +3,17 @@ import { Download, Loader2 } from 'lucide-react';
 import Sidebar from '../components/Sidebar';
 import { ErrorMessage } from '../components/ErrorMessage';
 import { generateReport, type TimeInterval as ApiTimeInterval, type ReportType } from '../services/report.service';
-import SuccessDialog from '../components/SuccessDialog'; // Asegúrate de importar correctamente
+import SuccessDialog from '../components/SuccessDialog';
 
 const intervalMap: Record<TimeInterval, ApiTimeInterval> = {
-    daily: 'mensual',
-    weekly: 'semestral',
     monthly: 'mensual',
+    quarterly: 'trimestral',
+    semester: 'semestral',
     yearly: 'anual',
     custom: 'personalizado'
 };
 
-type TimeInterval = 'daily' | 'weekly' | 'monthly' | 'yearly' | 'custom';
+type TimeInterval = 'monthly' | 'quarterly' | 'semester' | 'yearly' | 'custom';
 
 const Report = () => {
     const [loading, setLoading] = useState(false);
@@ -68,14 +68,13 @@ const Report = () => {
             await generateReport({
                 type: reportType,
                 interval: apiInterval,
-                year: interval === 'yearly' || interval === 'monthly' ? parseInt(year) : undefined,
-                month: interval === 'monthly' ? parseInt(month) : undefined,
+                year: ['yearly', 'semester', 'quarterly', 'monthly'].includes(interval) ? parseInt(year) : undefined,
+                month: ['semester', 'quarterly', 'monthly'].includes(interval) ? parseInt(month) : undefined,
                 startDate: interval === 'custom' ? startDateObj : undefined,
                 endDate: interval === 'custom' ? endDateObj : undefined
             });
 
             setDialogOpen(true);
-
         } catch (err: any) {
             setError(err.message || 'Error al generar el reporte');
         } finally {
@@ -98,6 +97,62 @@ const Report = () => {
                             max={new Date().getFullYear()}
                         />
                     </div>
+                );
+            case 'semester':
+                return (
+                    <>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Año</label>
+                            <input
+                                type="number"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                value={year}
+                                onChange={(e) => setYear(e.target.value)}
+                                min="2000"
+                                max={new Date().getFullYear()}
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
+                            <select
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                value={month} // Reutilizamos month para el semestre
+                                onChange={(e) => setMonth(e.target.value)}
+                            >
+                                <option value="1">Primer semestre (Ene-Jun)</option>
+                                <option value="2">Segundo semestre (Jul-Dic)</option>
+                            </select>
+                        </div>
+                    </>
+                );
+            case 'quarterly':
+                return (
+                    <>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Año</label>
+                            <input
+                                type="number"
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                value={year}
+                                onChange={(e) => setYear(e.target.value)}
+                                min="2000"
+                                max={new Date().getFullYear()}
+                            />
+                        </div>
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Trimestre</label>
+                            <select
+                                className="w-full p-2 border border-gray-300 rounded-md"
+                                value={month}
+                                onChange={(e) => setMonth(e.target.value)}
+                            >
+                                <option value="1">Primer trimestre (Ene-Mar)</option>
+                                <option value="2">Segundo trimestre (Abr-Jun)</option>
+                                <option value="3">Tercer trimestre (Jul-Sep)</option>
+                                <option value="4">Cuarto trimestre (Oct-Dic)</option>
+                            </select>
+                        </div>
+                    </>
                 );
             case 'monthly':
                 return (
@@ -209,6 +264,8 @@ const Report = () => {
                                         onChange={(e) => setInterval(e.target.value as TimeInterval)}
                                     >
                                         <option value="monthly">Mensual</option>
+                                        <option value="quarterly">Trimestral</option>
+                                        <option value="semester">Semestral</option>
                                         <option value="yearly">Anual</option>
                                         <option value="custom">Personalizado</option>
                                     </select>

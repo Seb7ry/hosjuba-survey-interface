@@ -1,4 +1,4 @@
-import { X, CheckCircle2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 
@@ -6,7 +6,7 @@ type ConfirmDialogProps = {
   isOpen: boolean;
   message: string;
   onCancel: () => void;
-  onConfirm: () => Promise<void>; // Simplificado a solo Promise<void>
+  onConfirm: () => Promise<void>;
   isProcessing?: boolean;
   successMessage?: string;
 };
@@ -17,29 +17,18 @@ const ConfirmDialog = ({
   onCancel,
   onConfirm,
   isProcessing = false,
-  successMessage = "Operación completada con éxito"
 }: ConfirmDialogProps) => {
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [, setShowSuccess] = useState(false);
 
   const handleConfirm = async () => {
-    try {
-      await onConfirm();
-      setShowSuccess(true);
-    } catch (error) {
-      // Manejar error si es necesario
-    }
-  };
-
-  const handleSuccessClose = () => {
-    setShowSuccess(false);
-    onCancel();
+    await onConfirm();
+    setShowSuccess(true);
   };
 
   if (!isOpen) return null;
 
   return (
     <>
-      {/* Diálogo de confirmación */}
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
         <div className="bg-white rounded-lg shadow-lg w-full max-w-xs p-6">
           <div className="flex justify-between items-center mb-4">
@@ -78,25 +67,6 @@ const ConfirmDialog = ({
           </div>
         </div>
       </div>
-
-      {/* Diálogo de éxito */}
-      {showSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-xs p-6">
-            <div className="text-center">
-              <CheckCircle2 className="mx-auto h-12 w-12 text-green-500 mb-4" />
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">{successMessage}</h3>
-              <button
-                type="button"
-                onClick={handleSuccessClose}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 text-sm font-medium"
-              >
-                Aceptar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
