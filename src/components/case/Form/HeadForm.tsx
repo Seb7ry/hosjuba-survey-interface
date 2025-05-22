@@ -48,6 +48,7 @@ const HeadForm = ({ formData, handleChange, setFormData, isPreventive }: HeadFor
         <CorrectiveInfo
           formData={formData}
           handleChange={handleChange}
+          setFormData={setFormData} // ¡Este es el cambio importante!
         />
       )}
     </>
