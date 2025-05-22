@@ -1,6 +1,6 @@
 import Sidebar from "../components/Sidebar";
 import { useNavigate } from "react-router-dom";
-import { FaWpforms, FaFileAlt } from "react-icons/fa";
+import { FaWpforms, FaFileAlt, FaTrashAlt } from "react-icons/fa";
 
 const Case = () => {
     const navigate = useNavigate();
@@ -25,6 +25,16 @@ const Case = () => {
             bgColor: "bg-yellow-50",
             textColor: "text-yellow-600",
             borderColor: "border-yellow-200"
+        },
+        {
+            id: 3,
+            title: "Casos Eliminados",
+            description: "Papelera de casos eliminados, podrás recuperarlos en menos de 30 días de su eliminación.",
+            icon: <FaTrashAlt />,
+            path: "deleted",
+            bgColor: "bg-gray-50",
+            textColor: "text-gray-600",
+            borderColor: "border-gray-200"
         }
     ];
 

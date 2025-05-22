@@ -54,3 +54,17 @@ export const deleteCase = async (id: any) => {
     const response = await axios.delete(`${API_URL}/case/${id}`, headers());
     return response.data;
 };
+
+export const getDeletedCases = async (caseNumber?: string) => {
+    const response = await axios.get(`${API_URL}/case/deleted`, {
+        ...headers(),
+        params: caseNumber ? { caseNumber } : {},
+    });
+    return response.data;
+};
+
+
+export const restoreCase = async (caseNumber: string) => {
+    const response = await axios.get(`${API_URL}/case/restore/${caseNumber}`, headers());
+    return response.data;
+};
