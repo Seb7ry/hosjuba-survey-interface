@@ -31,7 +31,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const [equipments, setEquipments] = useState<EquipmentResponse[]>([]);
     const [filteredEquipments, setFilteredEquipments] = useState<EquipmentResponse[]>([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
+    const [, setError] = useState<string | null>(null);
     const [showDropdowns, setShowDropdowns] = useState<boolean[]>([]);
 
     useEffect(() => {
@@ -101,7 +101,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             type: equipment.type,
             serial: equipment.serial,
             inventoryNumber: equipment.numberInventory,
-            convention: updatedEquipments[index].convention || '' // Mantener el valor de convention
+            convention: updatedEquipments[index].convention || '' 
         };
 
         handleChange({
@@ -114,22 +114,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         const newShowDropdowns = [...showDropdowns];
         newShowDropdowns[index] = false;
         setShowDropdowns(newShowDropdowns);
-    };
-
-    const handleEquipmentChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        const updatedEquipments = [...formData.serviceData.equipments];
-        updatedEquipments[index] = {
-            ...updatedEquipments[index],
-            [name]: value
-        };
-
-        handleChange({
-            target: {
-                name: "serviceData.equipments",
-                value: updatedEquipments
-            }
-        });
     };
 
     const handleConventionChange = (index: number, e: ChangeEvent<HTMLSelectElement>) => {
@@ -156,7 +140,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             type: "",
             serial: "",
             inventoryNumber: "",
-            convention: "" // Añadido campo convention
+            convention: "" 
         };
 
         handleChange({
@@ -265,6 +249,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                         <input
                                             type="text"
                                             name="name"
+                                            required
                                             placeholder="Busque el equipo por nombre"
                                             value={equipment.name}
                                             onChange={(e) => handleEquipmentSearch(index, e)}

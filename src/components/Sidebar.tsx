@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { logout } from "../services/auth.service";
 import {
   Menu,
   X,
@@ -16,10 +17,16 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const department = sessionStorage.getItem("department") || "";
 
-  const handleLogout = () => {
-    sessionStorage.clear();
-    navigate("/");
+
+  const handleLogout = async () => {
+    const result = await logout();
+    if (result === 'Error al cerrar sesión') {
+      alert('No se pudo cerrar sesión. Intenta de nuevo.');
+      return;
+    }
+    window.location.href = '/';
   };
 
   const handleGoBack = () => {
@@ -32,6 +39,7 @@ const Sidebar = () => {
     { label: "Usuarios", icon: <User size={20} />, path: "/user" },
     { label: "Equipos", icon: <Monitor size={20} />, path: "/equipment" },
     { label: "Casos", icon: <ClipboardList size={20} />, path: "/case" },
+    { label: "MisCasos", icon: <ClipboardList size={20} />, path: "/user/case" },
     { label: "Reportes", icon: <BarChart2 size={20} />, path: "/report" },
   ];
 
@@ -97,30 +105,39 @@ const Sidebar = () => {
 
           <nav className="flex-1 overflow-y-auto py-2 px-3">
             <ul className="space-y-1">
-              {menuItems.map((item) => (
-                <li key={item.label}>
-                  <button
-                    onClick={() => {
-                      navigate(item.path);
-                      setOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 group ${location.pathname === item.path
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
-                      }`}
-                  >
-                    <span
-                      className={`transition-colors duration-200 ${location.pathname === item.path
-                        ? "text-blue-700"
-                        : "text-gray-500 group-hover:text-blue-600"
+              {menuItems
+                .filter((item) => {
+                  if (item.path === "/case" && department !== "Sistemas") return false;
+                  if (item.path === "/user" && department !== "Sistemas") return false;
+                  if (item.path === "/equipment" && department !== "Sistemas") return false;
+                  if (item.path === "/report" && department !== "Sistemas") return false;
+                  if (item.path === "/user/case" && department === "Sistemas") return false;
+                  return true;
+                })
+                .map((item) => (
+                  <li key={item.label}>
+                    <button
+                      onClick={() => {
+                        navigate(item.path);
+                        setOpen(false);
+                      }}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors duration-200 group ${location.pathname === item.path
+                        ? "bg-blue-100 text-blue-700"
+                        : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
                         }`}
                     >
-                      {item.icon}
-                    </span>
-                    <span>{item.label}</span>
-                  </button>
-                </li>
-              ))}
+                      <span
+                        className={`transition-colors duration-200 ${location.pathname === item.path
+                          ? "text-blue-700"
+                          : "text-gray-500 group-hover:text-blue-600"
+                          }`}
+                      >
+                        {item.icon}
+                      </span>
+                      <span>{item.label}</span>
+                    </button>
+                  </li>
+                ))}
             </ul>
           </nav>
 

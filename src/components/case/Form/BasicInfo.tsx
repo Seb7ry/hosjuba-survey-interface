@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllDepartments, type DepartmentData } from "../../../services/department.service";
+import ConfirmDialog from "../../ConfirmDialog";
 
 interface BasicInfoProps {
   formData: any;
@@ -14,6 +15,8 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [pendingToRatingChange, setPendingToRatingChange] = useState(false);
 
   useEffect(() => {
     const loadDepartments = async () => {
@@ -136,8 +139,11 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
           >
             <option value="Abierto">Abierto</option>
             <option value="En proceso">En proceso</option>
-            <option value="Cerrado">Cerrado</option>
+            <option value="Cerrado" disabled>
+              Cerrado
+            </option>
           </select>
+
         </div>
 
         {/* Textareas en una sola fila para pantallas grandes */}
@@ -163,6 +169,41 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              id="toRating"
+              name="toRating"
+              type="checkbox"
+              checked={formData.toRating || pendingToRatingChange}
+              onChange={(e) => {
+                const checked = e.target.checked;
+                if (!checked) {
+                  setFormData((prev: any) => ({ ...prev, toRating: false }));
+                } else {
+                  setPendingToRatingChange(true);
+                  setShowConfirmDialog(true);
+                }
+              }}
+              className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+            />
+            <label htmlFor="toRating" className="text-sm font-medium text-gray-700">
+              ¿Habilitar para calificación?
+            </label>
+          </div>
+          <ConfirmDialog
+            isOpen={showConfirmDialog}
+            message="¿Estás seguro de que deseas habilitar este caso para calificación? Recuerda que una vez calificado no se podrá modificar después."
+            onCancel={() => {
+              setShowConfirmDialog(false);
+              setPendingToRatingChange(false);
+            }}
+            onConfirm={async () => {
+              setFormData((prev: any) => ({ ...prev, toRating: true }));
+              setShowConfirmDialog(false);
+              setPendingToRatingChange(false);
+            }}
+          />
         </div>
       </div>
     </div>

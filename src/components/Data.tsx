@@ -3,6 +3,7 @@ import { useState } from "react";
 export const useFormPreventive = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
+        toRating: false,
         typeCase: "Preventivo",
         serviceType: "Mantenimiento Preventivo",
         dependency: "",
@@ -22,10 +23,10 @@ export const useFormPreventive = () => {
             signature: ""
         },
         effectivenessRating: {
-            value: 1
+            value: 0
         },
         satisfactionRating: {
-            value: 1
+            value: 0
         },
         serviceData: {
             name: "",
@@ -109,6 +110,7 @@ export const useFormPreventive = () => {
 export const useFormCorrective = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
+        toRating: false,
         typeCase: "Mantenimiento",
         serviceType: "",
         dependency: "",
@@ -128,10 +130,10 @@ export const useFormCorrective = () => {
             signature: ""
         },
         effectivenessRating: {
-            value: 1
+            value: 0
         },
         satisfactionRating: {
-            value: 1
+            value: 0
         },
         serviceData: {
             description: "",

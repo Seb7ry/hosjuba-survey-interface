@@ -77,19 +77,6 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
         setShowDropdown(false);
     };
 
-    const validateFields = () => {
-        if (!formData.serviceData.serial && !formData.serviceData.numberInventory) {
-            setError("Debe ingresar al menos el Serial o el Número de Inventario");
-            return false;
-        }
-        setError(null);
-        return true;
-    };
-
-    const handleBlur = () => {
-        validateFields();
-    };
-
     return (
         <div className="mb-8">
             <h2 className="text-xl font-medium text-gray-700 mb-4 border-b pb-2">Información del Equipo</h2>

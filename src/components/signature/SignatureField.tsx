@@ -1,4 +1,3 @@
-// components/SignatureField.tsx
 import { useRef, type ChangeEvent } from 'react';
 import { Upload, Edit2, X } from 'lucide-react';
 
