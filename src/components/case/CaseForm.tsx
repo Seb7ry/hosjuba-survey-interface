@@ -100,7 +100,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
         }
       } else {
         updatedOrCreatedCase = await createCase(formData);
-
+        console.log("Resultado de createCase:", updatedOrCreatedCase);
         if (!isPreventive) {
           const currentServiceData = formData.serviceData as any;
           shouldCreateEscalation =
@@ -118,7 +118,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
             status: "Cerrado",
             serviceData: {
               ...currentServiceData,
-              solvedAt: new Date().toISOString() 
+              solvedAt: new Date().toISOString()
             }
           };
           await updateCase(numberCase, updatedOriginalCase);
