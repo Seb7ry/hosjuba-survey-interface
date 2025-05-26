@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshSession } from './session.service';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,6 +22,7 @@ export type PositionData = {
 export const getAllPosition = async (): Promise<PositionData[]> => {
   try {
     const response = await axios.get(`${API_URL}/position`, headers());
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al obtener el cargo.');
@@ -34,6 +36,7 @@ export const createPosition = async (name: string): Promise<PositionData> => {
       { name },
       headers()
     );
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     console.error('Error creating position:', error.response?.data);
@@ -48,6 +51,7 @@ export const updatePosition = async (currentName: string, newName: string): Prom
       { currentName, newName },
       headers()
     );
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     console.error('Error updating position:', error.response?.data);
@@ -59,11 +63,12 @@ export const deletePosition = async (name: string): Promise<void> => {
   try {
     await axios.delete(
       `${API_URL}/position`,
-      { 
+      {
         ...headers(),
-        data: { name } 
+        data: { name }
       }
     );
+    await refreshSession(sessionStorage.getItem('username') || '')
   } catch (error: any) {
     console.error('Error deleting position:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Error al eliminar el cargo.');

@@ -1,5 +1,71 @@
 import { useState } from "react";
 
+
+export const useFormCorrective = () => {
+    const [formData, setFormData] = useState({
+        caseNumber: "202X",
+        toRating: false,
+        rated: false,
+        typeCase: "Mantenimiento",
+        serviceType: "",
+        dependency: "",
+        status: "Abierto",
+        reportedAt: new Date().toISOString(),
+        observations: "",
+        reportedBy: {
+            _id: "",
+            name: "",
+            position: "",
+            department: ""
+        },
+        assignedTechnician: {
+            _id: "",
+            name: "",
+            position: "",
+            signature: ""
+        },
+        effectivenessRating: {
+            value: 0
+        },
+        satisfactionRating: {
+            value: 0
+        },
+        serviceData: {
+            description: "",
+            attendedAt: "",
+            solvedAt: "",
+            priority: "",
+            category: "",
+            level: "",
+            diagnosis: "",
+            solution: "",
+            requiresEscalation: false,
+            escalationTechnician: {
+                _id: "",
+                name: "",
+                position: "",
+                department: "",
+                signature: "",
+                level: ""
+            },
+            equipments: [{
+                name: "",
+                type: "",
+                brand: "",
+                model: "",
+                serial: "",
+                inventoryNumber: ""
+            }],
+            materials: [{
+                quantity: 0,
+                description: ""
+            }],
+        }
+    });
+
+    return { formData, setFormData };
+};
+
 export const useFormPreventive = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
@@ -101,77 +167,6 @@ export const useFormPreventive = () => {
                 verificacionYAjusteDeCablesDeConexion: false,
                 verificacionDeFuncionamiento: false,
                 limpieza: false
-            }
-        }
-    });
-
-    return { formData, setFormData };
-};
-
-export const useFormCorrective = () => {
-    const [formData, setFormData] = useState({
-        caseNumber: "202X",
-        toRating: false,
-        rated: false,
-        typeCase: "Mantenimiento",
-        serviceType: "",
-        dependency: "",
-        status: "Abierto",
-        reportedAt: new Date().toISOString(),
-        observations: "",
-        reportedBy: {
-            _id: "",
-            name: "",
-            position: "",
-            department: ""
-        },
-        assignedTechnician: {
-            _id: "",
-            name: "",
-            position: "",
-            signature: ""
-        },
-        effectivenessRating: {
-            value: 0
-        },
-        satisfactionRating: {
-            value: 0
-        },
-        serviceData: {
-            description: "",
-            attendedAt: "",
-            solvedAt: "",
-            priority: "",
-            category: "",
-            level: "",
-            diagnosis: "",
-            solution: "",
-            requiresEscalation: false,
-            escalationTechnician: {
-                _id: "",
-                name: "",
-                position: "",
-                signature: ""
-            },
-            equipments: [{
-                name: "",
-                type: "",
-                brand: "",
-                model: "",
-                serial: "",
-                inventoryNumber: ""
-            }],
-            materials: [{
-                quantity: 0,
-                description: ""
-            }],
-            escalatedTechnician: {
-                _id: "",
-                name: "",
-                position: "",
-                department: "",
-                signature: "",
-                level: ""
             }
         }
     });

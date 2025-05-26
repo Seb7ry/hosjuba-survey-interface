@@ -252,22 +252,27 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                                 <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
                                                     <FaEye className="w-4 h-4" />
                                                 </button>
-                                                {hasPriority &&
+                                                {hasPriority ? (
                                                     <button
                                                         onClick={() => navigate(`/corrective/edit/${item.numero}`)}
-                                                        className="text-blue-600 hover:text-blue-900 transition-colors"
-                                                        title="Editar">
+                                                        className={`text-blue-600 hover:text-blue-900 transition-colors ${item.estado === "Cerrado" ? "opacity-50 cursor-not-allowed" : ""
+                                                            }`}
+                                                        title={item.estado === "Cerrado" ? "No se puede editar un caso cerrado" : "Editar"}
+                                                        disabled={item.estado === "Cerrado" || isDeleting}
+                                                    >
                                                         <FaEdit className="w-4 h-4" />
-                                                    </button>}
-
-                                                {!hasPriority &&
+                                                    </button>
+                                                ) : (
                                                     <button
                                                         onClick={() => navigate(`/preventive/edit/${item.numero}`)}
-                                                        className="text-blue-600 hover:text-blue-900 transition-colors"
-                                                        title="Editar">
+                                                        className={`text-blue-600 hover:text-blue-900 transition-colors ${item.estado === "Cerrado" ? "opacity-50 cursor-not-allowed" : ""
+                                                            }`}
+                                                        title={item.estado === "Cerrado" ? "No se puede editar un caso cerrado" : "Editar"}
+                                                        disabled={item.estado === "Cerrado" || isDeleting}
+                                                    >
                                                         <FaEdit className="w-4 h-4" />
-                                                    </button>}
-
+                                                    </button>
+                                                )}
                                                 <button
                                                     className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                     title="Eliminar"

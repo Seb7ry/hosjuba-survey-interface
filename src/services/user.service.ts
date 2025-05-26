@@ -37,6 +37,7 @@ export const getAllUsers = async (): Promise<UserData[]> => {
 export const getUserByUsername = async (username: string): Promise<UserData> => {
   try {
     const response = await axios.get(`${API_URL}/user/${username}`, headers());
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al obtener usuario.');
@@ -54,6 +55,7 @@ export const createUser = async (userData: UserData): Promise<UserData> => {
       position: userData.position,
       signature: userData.signature
     }, headers());
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al crear el usuario.');
@@ -75,7 +77,7 @@ export const updateUser = async (userData: UserData): Promise<UserData> => {
       sessionStorage.setItem('department', response.data.department);
       sessionStorage.setItem('position', response.data.position);
     }
-
+    await refreshSession(sessionStorage.getItem('username') || '')
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al actualizar el usuario.');
@@ -85,6 +87,7 @@ export const updateUser = async (userData: UserData): Promise<UserData> => {
 export const deleteUser = async (username: string): Promise<void> => {
   try {
     await axios.delete(`${API_URL}/user/${username}`, headers());
+    await refreshSession(sessionStorage.getItem('username') || '')
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al eliminar el usuario.');
   }

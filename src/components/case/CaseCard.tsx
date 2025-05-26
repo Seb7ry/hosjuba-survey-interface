@@ -11,7 +11,7 @@ type CaseCardsProps = {
     isDeleting: boolean;
     error?: string;
     onErrorClose?: () => void;
-    typeCase: "Mantenimiento" | "Preventivo"; 
+    typeCase: "Mantenimiento" | "Preventivo";
 };
 
 const CaseCards = ({
@@ -73,6 +73,10 @@ const CaseCards = ({
                                 <p className="text-gray-500">Funcionario</p>
                                 <p>{item.funcionario}</p>
                             </div>
+                            <div>
+                                <p className="text-gray-500">Técnico</p>
+                                <p>{item.tecnico || 'Sin asignar'}</p>
+                            </div>
                         </div>
 
                         <div className="mt-3 flex justify-end space-x-4">
@@ -80,14 +84,17 @@ const CaseCards = ({
                                 <FaEye className="w-4 h-4" />
                             </button>
                             <button
-                                className="text-blue-600 hover:text-blue-900 transition-colors"
-                                title="Editar"
-                                onClick={() => handleEditClick(item.numero)}
+                                className={`text-blue-600 hover:text-blue-900 transition-colors ${item.estado === "Cerrado" ? "opacity-50 cursor-not-allowed" : ""
+                                    }`}
+                                title={item.estado === "Cerrado" ? "No se puede editar un caso cerrado" : "Editar"}
+                                onClick={() => item.estado !== "Cerrado" && handleEditClick(item.numero)}
+                                disabled={item.estado === "Cerrado" || isDeleting}
                             >
                                 <FaEdit className="w-4 h-4" />
                             </button>
                             <button
-                                className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`text-red-600 hover:text-red-900 transition-colors ${isDeleting ? 'opacity-50 cursor-not-allowed' : ''
+                                    }`}
                                 title="Eliminar"
                                 onClick={() => onDelete(item.numero)}
                                 disabled={isDeleting}

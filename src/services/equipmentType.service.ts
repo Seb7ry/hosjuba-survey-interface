@@ -39,6 +39,7 @@ export const createEquipmentType = async (name: string): Promise<EquipmentTypeDa
             { name },
             headers()
         );
+        await refreshSession(sessionStorage.getItem('username') || '')
         return response.data;
     } catch (error: any) {
         console.error('Error creating equipment type:', error.response?.data);
@@ -53,6 +54,7 @@ export const updateEquipmentType = async (lastName: string, newName: string): Pr
             { newName },
             headers()
         );
+        await refreshSession(sessionStorage.getItem('username') || '')
         return response.data;
     } catch (error: any) {
         console.error('Error updating equipment type:', error.response?.data);
@@ -66,6 +68,7 @@ export const deleteEquipmentType = async (lastName: string): Promise<void> => {
             `${API_URL}/equip-type/${lastName}`,
             headers()
         );
+        await refreshSession(sessionStorage.getItem('username') || '')
     } catch (error: any) {
         console.error('Error deleting equipment type:', error.response?.data);
         throw new Error(error.response?.data?.message || 'Error al eliminar el tipo de equipo.');

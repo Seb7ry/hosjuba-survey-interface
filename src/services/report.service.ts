@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshSession } from './session.service';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -59,7 +60,7 @@ export const generateReport = async (params: GenerateReportParams) => {
 
         document.body.removeChild(link);
         window.URL.revokeObjectURL(url);
-
+        await refreshSession(sessionStorage.getItem('username') || '')
         return true;
     } catch (error: any) {
         if (error.response) {

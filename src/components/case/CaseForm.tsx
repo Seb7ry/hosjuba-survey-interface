@@ -21,7 +21,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [createdCaseNumber, setCreatedCaseNumber] = useState<string | null>(null);
+  const [, setCreatedCaseNumber] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { numberCase } = useParams();
@@ -82,11 +82,92 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
     try {
       let updatedOrCreatedCase;
-      
+      let shouldCreateEscalation = false;
+
       if (isEditMode && numberCase) {
+        const originalCase = await getCaseByNumber(numberCase);
         updatedOrCreatedCase = await updateCase(numberCase, formData);
+
+        if (!isPreventive) {
+          const currentServiceData = formData.serviceData as any;
+          const originalServiceData = originalCase.serviceData as any;
+
+          shouldCreateEscalation =
+            currentServiceData.requiresEscalation &&
+            currentServiceData.escalationTechnician?._id &&
+            (!originalServiceData.requiresEscalation ||
+              originalServiceData.escalationTechnician?._id !== currentServiceData.escalationTechnician._id);
+        }
       } else {
         updatedOrCreatedCase = await createCase(formData);
+
+        if (!isPreventive) {
+          const currentServiceData = formData.serviceData as any;
+          shouldCreateEscalation =
+            currentServiceData.requiresEscalation &&
+            currentServiceData.escalationTechnician?._id;
+        }
+      }
+
+      if (shouldCreateEscalation) {
+        const currentServiceData = formData.serviceData as any;
+
+        if (isEditMode && numberCase) {
+          const updatedOriginalCase = {
+            ...formData,
+            status: "Cerrado",
+            serviceData: {
+              ...currentServiceData,
+              solvedAt: new Date().toISOString() 
+            }
+          };
+          await updateCase(numberCase, updatedOriginalCase);
+        } else if (!isEditMode) {
+          const updatedOriginalCase = {
+            ...formData,
+            status: "Cerrado",
+            serviceData: {
+              ...currentServiceData,
+              solvedAt: new Date().toISOString()
+            }
+          };
+          await updateCase(updatedOrCreatedCase._id, updatedOriginalCase);
+        }
+
+        const escalationCaseData = JSON.parse(JSON.stringify(formData));
+        delete escalationCaseData._id;
+
+        const escalationCase = {
+          ...escalationCaseData,
+          caseNumber: "202X",
+          status: "Abierto",
+          assignedTechnician: {
+            _id: currentServiceData.escalationTechnician._id,
+            name: currentServiceData.escalationTechnician.name,
+            position: currentServiceData.escalationTechnician.position,
+            department: currentServiceData.escalationTechnician.department,
+            signature: currentServiceData.escalationTechnician.signature || ""
+          },
+          serviceData: {
+            ...currentServiceData,
+            level: currentServiceData.escalationTechnician.level,
+            requiresEscalation: false,
+            escalationTechnician: {
+              _id: "",
+              name: "",
+              position: "",
+              department: "",
+              signature: "",
+              level: ""
+            },
+            attendedAt: "",
+            solvedAt: "",
+            diagnosis: "",
+            solution: ""
+          }
+        };
+
+        await createCase(escalationCase);
       }
 
       setCreatedCaseNumber(updatedOrCreatedCase.caseNumber);
@@ -185,11 +266,19 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
       <SuccessDialog
         isOpen={showSuccessDialog}
-        message={isEditMode
-          ? `El caso fue editado correctamente.`
-          : `El caso fue creado correctamente.`
+        message={
+          isEditMode
+            ? !isPreventive &&
+              'requiresEscalation' in formData.serviceData &&
+              formData.serviceData.requiresEscalation
+              ? 'El caso fue actualizado y se creó el caso de escalamiento correctamente.'
+              : 'El caso fue actualizado correctamente.'
+            : !isPreventive &&
+              'requiresEscalation' in formData.serviceData &&
+              formData.serviceData.requiresEscalation
+              ? 'El caso principal y el caso de escalamiento fueron creados correctamente.'
+              : 'El caso fue creado correctamente.'
         }
-        caseNumber={createdCaseNumber}
         onClose={handleSuccessDialogClose}
       />
     </div>
