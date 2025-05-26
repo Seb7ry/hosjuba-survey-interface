@@ -3,7 +3,8 @@ import { X } from 'lucide-react';
 import { SignatureField } from '../../signature/SignatureField';
 import { FaStar } from 'react-icons/fa';
 import { getUserByUsername } from '../../../services/user.service';
-import SignaturePadModal from '../../signature/SignatureModal'; // Asegúrate de que la ruta sea correcta
+import SignaturePadModal from '../../signature/SignatureModal';
+import ConfirmDialog from '../../ConfirmDialog';
 
 interface RatingModalProps {
     isOpen: boolean;
@@ -11,15 +12,19 @@ interface RatingModalProps {
     onSubmit: (ratings: { satisfaction: number; effectiveness: number }, signature: string) => void;
     isSubmitting?: boolean;
     username: string;
+    onSuccess?: () => void;
+    caseNumber?: string; 
 }
 
-const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username }: RatingModalProps) => {
+const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username, onSuccess  }: RatingModalProps) => {
     const [satisfaction, setSatisfaction] = useState(0);
     const [effectiveness, setEffectiveness] = useState(0);
     const [signature, setSignature] = useState('');
     const [hoveredSatisfaction, setHoveredSatisfaction] = useState(0);
     const [hoveredEffectiveness, setHoveredEffectiveness] = useState(0);
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
+    const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+    const [, setShowSuccessDialog] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -70,25 +75,42 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
         setSignature('');
     };
 
-    const handleSubmit = () => {
+    const validateForm = () => {
         if (satisfaction === 0 || effectiveness === 0) {
             alert('Por favor califique ambos aspectos');
-            return;
+            return false;
         }
 
         if (!signature) {
             alert('Por favor agregue su firma');
-            return;
+            return false;
         }
 
-        onSubmit({ satisfaction, effectiveness }, signature);
-        onClose();
+        return true;
+    };
+
+    const handleSubmit = () => {
+        if (!validateForm()) return;
+        setShowConfirmDialog(true);
+    };
+
+    const confirmSubmit = async () => {
+        setShowConfirmDialog(false);
+
+        try {
+            await onSubmit({ satisfaction, effectiveness }, signature);
+            setShowSuccessDialog(false); 
+            onSuccess?.();
+        } catch (error) {
+            console.error('Error al enviar la calificación:', error);
+            alert('Ocurrió un error al enviar la calificación');
+        }
     };
 
     const renderStars = (rating: number, hoveredRating: number, setRating: (val: number) => void, setHoveredRating: (val: number) => void) => {
         return (
             <div className="flex justify-center space-x-1">
-                {[1, 2, 3, 4, 5].map((star) => (
+                {[1, 2, 3, 4].map((star) => (
                     <button
                         key={star}
                         type="button"
@@ -137,8 +159,10 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
                                     setHoveredSatisfaction
                                 )}
                                 <div className="flex justify-between text-xs text-gray-500 px-2">
-                                    <span>Muy insatisfecho</span>
-                                    <span>Muy satisfecho</span>
+                                    <span>Malo</span>
+                                    <span>Regular</span>
+                                    <span>Bueno</span>
+                                    <span>Excelente</span>
                                 </div>
                             </div>
 
@@ -151,8 +175,10 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
                                     setHoveredEffectiveness
                                 )}
                                 <div className="flex justify-between text-xs text-gray-500 px-2">
-                                    <span>Nada efectivo</span>
-                                    <span>Muy efectivo</span>
+                                    <span>Malo</span>
+                                    <span>Regular</span>
+                                    <span>Bueno</span>
+                                    <span>Excelente</span>
                                 </div>
                             </div>
                         </div>
@@ -195,6 +221,14 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
                 isOpen={isSignatureModalOpen}
                 onClose={() => setIsSignatureModalOpen(false)}
                 onSave={handleSaveSignature}
+            />
+
+            <ConfirmDialog
+                isOpen={showConfirmDialog}
+                message="¿Estás seguro que deseas enviar esta calificación?"
+                onCancel={() => setShowConfirmDialog(false)}
+                onConfirm={confirmSubmit}
+                isProcessing={isSubmitting}
             />
         </>
     );

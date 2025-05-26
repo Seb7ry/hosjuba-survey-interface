@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaStar } from "react-icons/fa";
+import { useEffect, useState } from 'react';
+import { FaChevronLeft, FaChevronRight, FaFileAlt, FaStar } from "react-icons/fa";
 import type { Case } from '../../../pages/CaseU';
 import CaseUCard from './CaseUCard';
 import { formatDateTime } from "../../Utils";
 import CaseURating from './CaseURating';
-import { updateCase } from '../../../services/case.service';
+import { updateCase, getCaseByNumber } from '../../../services/case.service';
+import SuccessDialog from '../../SuccessDialog';
 
 interface CaseUListProps {
   cases: Case[];
@@ -31,28 +32,37 @@ const CaseUList = ({
   onCaseUpdate
 }: CaseUListProps) => {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
-  const [selectedCaseId, setSelectedCaseId] = useState('');
+  const [selectedCaseNumber, setSelectedCaseNumber] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [localCases, setLocalCases] = useState<Case[]>(cases);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const user = sessionStorage.getItem("username")?.toString();
   const username = user || "";
 
+  useEffect(() => {
+    setLocalCases(cases);
+  }, [cases]);
 
   const getPaginatedCases = () => {
     const startIndex = (currentPage - 1) * itemsPerPage;
-    return cases.slice(startIndex, startIndex + itemsPerPage);
+    return localCases.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  const handleRateClick = (id: string) => {
-    setSelectedCaseId(id);
+  const handleRateClick = (numero: string) => {
+    setSelectedCaseNumber(numero);
     setRatingModalOpen(true);
   };
 
   const handleSubmitRating = async (ratings: { satisfaction: number; effectiveness: number }, signature: string) => {
     try {
       setIsSubmitting(true);
-      
-      const caseToUpdate = cases.find(c => c.id === selectedCaseId);
-      if (!caseToUpdate) return;
+
+      const caseToUpdate = await getCaseByNumber(selectedCaseNumber);
+
+      if (!caseToUpdate) {
+        console.error('Caso no encontrado');
+        return;
+      }
 
       const updateData = {
         satisfactionRating: { value: ratings.satisfaction },
@@ -61,16 +71,37 @@ const CaseUList = ({
           ...caseToUpdate.reportedBy,
           signature: signature
         },
-        toRating: false
+        rated: true,
+        status: 'Cerrado',
       };
 
-      const updatedCase = await updateCase(selectedCaseId, updateData);
-      onCaseUpdate(updatedCase);
+      const updatedCase = await updateCase(selectedCaseNumber, updateData);
+
+      setLocalCases(prevCases =>
+        prevCases.map(c => c.numero === selectedCaseNumber ? { ...c, ...updateData } : c)
+      );
+
+      onCaseUpdate({
+        ...updatedCase,
+        reportedBy: updatedCase.reportedBy.name,
+        toRating: updatedCase.toRating,
+        rated: updatedCase.rated,
+        id: updatedCase._id,
+        numero: updatedCase.caseNumber,
+        tipoServicio: updatedCase.typeCase,
+        dependencia: updatedCase.dependency,
+        estado: updatedCase.status,
+        fechaReporte: updatedCase.reportedAt,
+        tecnico: updatedCase.assignedTechnician.name,
+      });
+
       setRatingModalOpen(false);
     } catch (error) {
       console.error('Error al calificar el caso:', error);
+      alert('Error al enviar la calificación. Por favor intente nuevamente.');
     } finally {
       setIsSubmitting(false);
+      setRatingModalOpen(false);
     }
   };
 
@@ -95,7 +126,7 @@ const CaseUList = ({
                 getPaginatedCases().map((item: Case) => (
                   <tr
                     key={item.id}
-                    className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                    className={`transition-colors text-sm ${item.rated ? 'bg-green-50 hover:bg-green-100' : 'hover:bg-gray-50'}`}
                   >
                     <td className="px-6 py-4 font-medium">{item.numero}</td>
                     <td className="px-6 py-4 font-medium">{item.tipoServicio}</td>
@@ -114,13 +145,27 @@ const CaseUList = ({
                     <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
                     <td className="px-6 py-4">
                       <button
-                        onClick={() => handleRateClick(item.id)}
-                        disabled={!item.toRating}
-                        className={`text-yellow-500 hover:text-yellow-700 transition-colors flex items-center ${!item.toRating ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        title={!item.toRating ? "Este caso ya fue calificado" : "Calificar servicio"}
+                        onClick={() => !item.rated && handleRateClick(item.numero)}
+                        disabled={item.rated}
+                        className={`py-1.5 px-3 border rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${item.rated
+                          ? 'border-green-200 bg-green-100 text-green-700 hover:bg-green-200 cursor-default'
+                          : !item.toRating
+                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+                            : 'border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 hover:border-yellow-300'
+                          }`}
+                        title={item.rated ? "Documento calificado" : !item.toRating ? "Este caso ya fue calificado" : "Calificar servicio"}
                       >
-                        <FaStar className="w-5 h-5" />
-                        <span className="ml-1">Calificar</span>
+                        {item.rated ? (
+                          <>
+                            <FaFileAlt className="w-4 h-4" />
+                            <span>Documento</span>
+                          </>
+                        ) : (
+                          <>
+                            <FaStar className="w-4 h-4" />
+                            <span>Calificar</span>
+                          </>
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -139,9 +184,9 @@ const CaseUList = ({
         <div className="space-y-3">
           {getPaginatedCases().length > 0 ? (
             getPaginatedCases().map((item) => (
-              <CaseUCard 
-                key={item.id} 
-                item={item} 
+              <CaseUCard
+                key={item.numero}
+                item={item}
                 onRateClick={handleRateClick}
                 isRatingDisabled={!item.toRating}
               />
@@ -219,7 +264,18 @@ const CaseUList = ({
         onSubmit={handleSubmitRating}
         isSubmitting={isSubmitting}
         username={username}
+        caseNumber={selectedCaseNumber}
+        onSuccess={() => setShowSuccessMessage(true)}
       />
+
+      {showSuccessMessage && (
+        <SuccessDialog
+          isOpen={showSuccessMessage}
+          message="La calificación fue enviada correctamente."
+          caseNumber={selectedCaseNumber}
+          onClose={() => setShowSuccessMessage(false)}
+        />
+      )}
     </>
   );
 };

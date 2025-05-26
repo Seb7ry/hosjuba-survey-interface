@@ -1,4 +1,4 @@
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaFileAlt } from "react-icons/fa";
 import { formatDateTime } from "../../Utils";
 import type { Case } from '../../../pages/CaseU';
 
@@ -10,7 +10,7 @@ interface CaseUCardProps {
 
 const CaseUCard = ({ item, onRateClick, isRatingDisabled }: CaseUCardProps) => {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+    <div className={`p-4 rounded-lg shadow-sm border ${item.rated ? 'bg-green-50 border-green-100' : 'bg-white border-gray-100'}`}>
       <div className="grid grid-cols-2 gap-2 mb-3">
         <div>
           <p className="text-xs text-gray-500">N° Caso</p>
@@ -30,13 +30,12 @@ const CaseUCard = ({ item, onRateClick, isRatingDisabled }: CaseUCardProps) => {
         </div>
         <div>
           <p className="text-xs text-gray-500">Estado</p>
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-            item.estado === 'Completado'
-              ? 'bg-green-100 text-green-800'
-              : item.estado === 'En progreso'
-                ? 'bg-yellow-100 text-yellow-800'
-                : 'bg-red-100 text-red-800'
-          }`}>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.estado === 'Completado'
+            ? 'bg-green-100 text-green-800'
+            : item.estado === 'En progreso'
+              ? 'bg-yellow-100 text-yellow-800'
+              : 'bg-red-100 text-red-800'
+            }`}>
             {item.estado}
           </span>
         </div>
@@ -46,15 +45,27 @@ const CaseUCard = ({ item, onRateClick, isRatingDisabled }: CaseUCardProps) => {
         </div>
       </div>
       <button
-        onClick={() => !isRatingDisabled && onRateClick(item.id)}
+        onClick={() => !isRatingDisabled && onRateClick(item.numero)}
         disabled={isRatingDisabled}
-        className={`w-full mt-2 text-yellow-500 hover:text-yellow-700 transition-colors flex items-center justify-center ${
-          isRatingDisabled ? 'opacity-50 cursor-not-allowed' : ''
-        }`}
-        title={isRatingDisabled ? "Este caso ya fue calificado" : "Calificar servicio"}
+        className={`w-full mt-2 py-2 px-4 border rounded-md text-sm font-medium flex items-center justify-center space-x-2 transition-colors ${item.rated
+          ? 'border-green-200 bg-green-100 text-green-700 hover:bg-green-200 cursor-default'
+          : isRatingDisabled
+            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
+            : 'border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 hover:border-yellow-300'
+          }`}
+        title={item.rated ? "Documento calificado" : isRatingDisabled ? "Este caso ya fue calificado" : "Calificar servicio"}
       >
-        <FaStar className="w-5 h-5" />
-        <span className="ml-1">Calificar</span>
+        {item.rated ? (
+          <>
+            <FaFileAlt className="w-4 h-4" />
+            <span>Ver documento</span>
+          </>
+        ) : (
+          <>
+            <FaStar className="w-4 h-4" />
+            <span>Calificar</span>
+          </>
+        )}
       </button>
     </div>
   );

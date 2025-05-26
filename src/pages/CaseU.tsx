@@ -9,6 +9,7 @@ import { searchCases } from '../services/case.service';
 export type Case = {
     reportedBy: any;
     toRating: any;
+    rated: any;
     id: string;
     numero: string;
     tipoServicio: string;
@@ -98,7 +99,8 @@ const CaseU = () => {
                     fechaReporte: item.reportedAt,
                     tecnico: item.assignedTechnician?.name || 'Sin técnico',
                     reportedBy: item.reportedBy,
-                    toRating: item.toRating
+                    toRating: item.toRating,
+                    rated: item.rated,
                 }));
 
                 setCases(mappedCases);
@@ -138,7 +140,7 @@ const CaseU = () => {
     };
 
     const handleCaseUpdate = (updatedCase: Case) => {
-        setCases(prevCases => 
+        setCases(prevCases =>
             prevCases.map(c => c.id === updatedCase.id ? updatedCase : c)
         );
     };

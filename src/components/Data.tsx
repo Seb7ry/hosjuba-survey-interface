@@ -4,6 +4,7 @@ export const useFormPreventive = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
         toRating: false,
+        rated: false,
         typeCase: "Preventivo",
         serviceType: "Mantenimiento Preventivo",
         dependency: "",
@@ -111,6 +112,7 @@ export const useFormCorrective = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
         toRating: false,
+        rated: false,
         typeCase: "Mantenimiento",
         serviceType: "",
         dependency: "",

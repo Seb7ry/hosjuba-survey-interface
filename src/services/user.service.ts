@@ -37,8 +37,6 @@ export const getAllUsers = async (): Promise<UserData[]> => {
 export const getUserByUsername = async (username: string): Promise<UserData> => {
   try {
     const response = await axios.get(`${API_URL}/user/${username}`, headers());
-    console.log('nombre',username)
-    console.log('hola',response)
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al obtener usuario.');
