@@ -85,6 +85,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
       let shouldCreateEscalation = false;
 
       if (isEditMode && numberCase) {
+
         const originalCase = await getCaseByNumber(numberCase);
         updatedOrCreatedCase = await updateCase(numberCase, formData);
 
@@ -100,7 +101,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
         }
       } else {
         updatedOrCreatedCase = await createCase(formData);
-        console.log("Resultado de createCase:", updatedOrCreatedCase);
+
         if (!isPreventive) {
           const currentServiceData = formData.serviceData as any;
           shouldCreateEscalation =
@@ -112,26 +113,21 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
       if (shouldCreateEscalation) {
         const currentServiceData = formData.serviceData as any;
 
+        const updatedOriginalCase = {
+          ...formData,
+          status: "Cerrado",
+          serviceData: {
+            ...currentServiceData,
+            solvedAt: new Date().toISOString()
+          }
+        };
+
         if (isEditMode && numberCase) {
-          const updatedOriginalCase = {
-            ...formData,
-            status: "Cerrado",
-            serviceData: {
-              ...currentServiceData,
-              solvedAt: new Date().toISOString()
-            }
-          };
           await updateCase(numberCase, updatedOriginalCase);
-        } else if (!isEditMode) {
-          const updatedOriginalCase = {
-            ...formData,
-            status: "Cerrado",
-            serviceData: {
-              ...currentServiceData,
-              solvedAt: new Date().toISOString()
-            }
-          };
-          await updateCase(updatedOrCreatedCase._id, updatedOriginalCase);
+        } else {
+          const newCase = JSON.parse(JSON.stringify(updatedOriginalCase))
+          delete newCase.caseNumber;
+          await updateCase(updatedOrCreatedCase.caseNumber, newCase);
         }
 
         const escalationCaseData = JSON.parse(JSON.stringify(formData));
@@ -139,7 +135,6 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
         const escalationCase = {
           ...escalationCaseData,
-          caseNumber: "202X",
           status: "Abierto",
           assignedTechnician: {
             _id: currentServiceData.escalationTechnician._id,
@@ -167,13 +162,17 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
           }
         };
 
-        await createCase(escalationCase);
+        const escalationCaseResult = await createCase(escalationCase);
+        if (!escalationCaseResult || !escalationCaseResult._id) {
+          console.error("❌ Fallo al crear el caso de escalamiento: Respuesta inválida");
+          throw new Error("Error al crear el caso de escalamiento. La respuesta fue inválida.");
+        }
       }
 
       setCreatedCaseNumber(updatedOrCreatedCase.caseNumber);
       setShowSuccessDialog(true);
     } catch (error: any) {
-      console.error("Error al guardar el caso:", error);
+      console.error("💥 Error al guardar el caso:", error);
       alert('Error al guardar el caso. Por favor intente nuevamente.');
     } finally {
       setIsSubmitting(false);
