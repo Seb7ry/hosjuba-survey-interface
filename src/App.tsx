@@ -55,7 +55,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
-      
+
       {accessToken && window.location.pathname !== "/" && <SessionMonitor />}
     </>
   );

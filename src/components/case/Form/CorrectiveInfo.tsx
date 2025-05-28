@@ -259,7 +259,7 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
 
                 {/* Sección de escalamiento (aparece con animación) */}
                 <div
-                    className={`md:col-span-2 overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
+                    className={`md:col-span-2 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
                 >
                     {formData.serviceData.requiresEscalation && (
                         <div className="mt-4 space-y-6 border-t pt-4">
@@ -323,20 +323,22 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     </div>
 
                                     {showDropdownById && filteredUsersById.length > 0 && (
-                                        <ul className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                            {filteredUsersById.map((user) => (
-                                                <li
-                                                    key={user.username}
-                                                    className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
-                                                    onClick={() => selectEscalationTechnician(user)}
-                                                >
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">@{user.username}</span>
-                                                        <span className="text-gray-500">{user.name}</span>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        <div className="relative z-50">
+                                            <ul className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                {filteredUsersById.map((user) => (
+                                                    <li
+                                                        key={user.username}
+                                                        className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
+                                                        onClick={() => selectEscalationTechnician(user)}
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium">@{user.username}</span>
+                                                            <span className="text-gray-500">{user.name}</span>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     )}
                                 </div>
 
@@ -359,20 +361,22 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     </div>
 
                                     {showDropdownByName && filteredUsersByName.length > 0 && (
-                                        <ul className="absolute z-10 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                            {filteredUsersByName.map((user) => (
-                                                <li
-                                                    key={user.username}
-                                                    className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
-                                                    onClick={() => selectEscalationTechnician(user)}
-                                                >
-                                                    <div className="flex flex-col">
-                                                        <span className="font-medium">{user.name}</span>
-                                                        <span className="text-gray-500">@{user.username}</span>
-                                                    </div>
-                                                </li>
-                                            ))}
-                                        </ul>
+                                        <div className="relative z-50">
+                                            <ul className="absolute mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                {filteredUsersByName.map((user) => (
+                                                    <li
+                                                        key={user.username}
+                                                        className="text-gray-900 cursor-default select-none relative py-2 pl-3 pr-9 hover:bg-indigo-50"
+                                                        onClick={() => selectEscalationTechnician(user)}
+                                                    >
+                                                        <div className="flex flex-col">
+                                                            <span className="font-medium">{user.name}</span>
+                                                            <span className="text-gray-500">@{user.username}</span>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
                                     )}
                                 </div>
 
@@ -395,8 +399,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                         </div>
                     )}
                 </div>
-
-
             </div>
         </div>
     );

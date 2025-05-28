@@ -111,7 +111,6 @@ const Sidebar = () => {
                   if (item.path === "/user" && department !== "Sistemas") return false;
                   if (item.path === "/equipment" && department !== "Sistemas") return false;
                   if (item.path === "/report" && department !== "Sistemas") return false;
-                  if (item.path === "/user/case" && department === "Sistemas") return false;
                   return true;
                 })
                 .map((item) => (

@@ -8,6 +8,7 @@ import ConfirmDialog from "../ConfirmDialog";
 import { ErrorMessage } from "../ErrorMessage";
 import { useNavigate } from "react-router-dom";
 import SuccessDialog from "../SuccessDialog";
+import CasePDF from "./CasePDF";
 
 export type Case = {
     id: string;
@@ -53,6 +54,9 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     const [isDeleting, setIsDeleting] = useState(false);
     const [showError, setShowError] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+
+    const [showPdfModal, setShowPdfModal] = useState(false);
+    const [selectedCaseNumber, setSelectedCaseNumber] = useState<string | null>(null);
 
     useEffect(() => {
         const handleResize = () => {
@@ -249,7 +253,14 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center space-x-4">
-                                                <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
+                                                <button
+                                                    className="text-yellow-600 hover:text-yellow-900 transition-colors"
+                                                    title="Ver"
+                                                    onClick={() => {
+                                                        setSelectedCaseNumber(item.numero);
+                                                        setShowPdfModal(true);
+                                                    }}
+                                                >
                                                     <FaEye className="w-4 h-4" />
                                                 </button>
                                                 {hasPriority ? (
@@ -364,6 +375,12 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     </div>
                 </div>
             )}
+            <CasePDF
+                isOpen={showPdfModal}
+                onClose={() => setShowPdfModal(false)}
+                caseNumber={selectedCaseNumber || ''}
+                typeCase={typeCase}
+            />
         </div>
     );
 };

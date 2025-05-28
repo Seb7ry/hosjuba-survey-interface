@@ -1,6 +1,7 @@
 import { useState, useEffect, type ChangeEvent } from "react";
 import { getAllEquipment, type EquipmentResponse } from "../../../services/equipment.service";
 import { serviceConventions } from "../../Data";
+import { ErrorMessage } from "../../../components/ErrorMessage";
 
 interface Equipment {
     name: string;
@@ -13,8 +14,8 @@ interface Equipment {
 }
 
 interface Material {
-    quantity: number;
-    description: string;
+    quantity?: number;
+    description?: string;
 }
 
 interface CorrectiveBodyProps {
@@ -33,6 +34,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const [isLoading, setIsLoading] = useState(false);
     const [, setError] = useState<string | null>(null);
     const [showDropdowns, setShowDropdowns] = useState<boolean[]>([]);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const loadEquipments = async () => {
@@ -64,7 +66,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             type: value ? updatedEquipments[index].type : '',
             serial: value ? updatedEquipments[index].serial : '',
             inventoryNumber: value ? updatedEquipments[index].inventoryNumber : '',
-            convention: updatedEquipments[index].convention || '' 
+            convention: updatedEquipments[index].convention || ''
         };
 
         handleChange({
@@ -101,7 +103,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             type: equipment.type,
             serial: equipment.serial,
             inventoryNumber: equipment.numberInventory,
-            convention: updatedEquipments[index].convention || '' 
+            convention: updatedEquipments[index].convention || ''
         };
 
         handleChange({
@@ -133,6 +135,11 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     };
 
     const addEquipment = () => {
+        if (formData.serviceData.equipments.length >= 5) {
+            setErrorMessage("No se pueden agregar más de 5 equipos");
+            return;
+        }
+
         const newEquipment: Equipment = {
             name: "",
             brand: "",
@@ -140,7 +147,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             type: "",
             serial: "",
             inventoryNumber: "",
-            convention: "" 
+            convention: ""
         };
 
         handleChange({
@@ -172,29 +179,44 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const handleMaterialChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const updatedMaterials = [...formData.serviceData.materials];
+
+        // Actualizar el valor del campo modificado
         updatedMaterials[index] = {
             ...updatedMaterials[index],
             [name]: name === "quantity" ? parseInt(value) || 0 : value
         };
 
+        // Filtrar materiales que no tengan valores válidos
+        const filteredMaterials = updatedMaterials.map(material => {
+            if (material.quantity === 0 && (!material.description || material.description.trim() === "")) {
+                return { quantity: undefined, description: undefined };
+            }
+            return material;
+        });
+
         handleChange({
             target: {
                 name: "serviceData.materials",
-                value: updatedMaterials
+                value: filteredMaterials
             }
         });
     };
 
     const addMaterial = () => {
+        if (formData.serviceData.materials.length >= 10) {
+            setErrorMessage("No se pueden agregar más de 10 materiales");
+            return;
+        }
+
         const newMaterial: Material = {
-            quantity: 0,
-            description: ""
+            quantity: undefined,
+            description: undefined
         };
 
         handleChange({
             target: {
                 name: "serviceData.materials",
-                value: [newMaterial, ...formData.serviceData.materials ]
+                value: [newMaterial, ...formData.serviceData.materials]
             }
         });
     };
@@ -213,14 +235,31 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
     return (
         <div className="space-y-6">
+            {/* Mostrar mensaje de error si existe */}
+            {errorMessage && (
+                <ErrorMessage
+                    message={errorMessage}
+                    onClose={() => setErrorMessage(null)}
+                />
+            )}
+
             {/* Sección de Equipos */}
             <div>
                 <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-lg font-medium text-gray-700">Equipos Intervenidos</h2>
+                    <h2 className="text-lg font-medium text-gray-700">
+                        Equipos Intervenidos
+                        <span className="text-sm text-gray-500 ml-2">
+                            ({formData.serviceData.equipments.length}/5)
+                        </span>
+                    </h2>
                     <button
                         type="button"
                         onClick={addEquipment}
-                        className="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        disabled={formData.serviceData.equipments.length >= 5}
+                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${formData.serviceData.equipments.length >= 5
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+                            }`}
                     >
                         + Agregar Equipo
                     </button>
@@ -342,8 +381,8 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                     >
                                         <option value="">Seleccione...</option>
                                         {serviceConventions.map((convention) => (
-                                            <option 
-                                                key={convention.text} 
+                                            <option
+                                                key={convention.text}
                                                 value={convention.text}
                                                 title={convention.text}
                                             >
@@ -361,11 +400,20 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
             {/* Sección de Materiales */}
             <div>
                 <div className="flex justify-between items-center mb-3">
-                    <h2 className="text-lg font-medium text-gray-700">Materiales Utilizados</h2>
+                    <h2 className="text-lg font-medium text-gray-700">
+                        Materiales Utilizados
+                        <span className="text-sm text-gray-500 ml-2">
+                            ({formData.serviceData.materials.length}/10)
+                        </span>
+                    </h2>
                     <button
                         type="button"
                         onClick={addMaterial}
-                        className="px-3 py-1 bg-indigo-600 text-white rounded-md text-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                        disabled={formData.serviceData.materials.length >= 10}
+                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${formData.serviceData.materials.length >= 10
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+                            }`}
                     >
                         + Agregar Material
                     </button>
@@ -394,7 +442,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                         name="quantity"
                                         min="0"
                                         placeholder="0"
-                                        value={material.quantity}
+                                        value={material.quantity || ''}
                                         onChange={(e) => handleMaterialChange(index, e)}
                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                     />
@@ -406,7 +454,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                         type="text"
                                         name="description"
                                         placeholder="Descripción del material"
-                                        value={material.description}
+                                        value={material.description || ''}
                                         onChange={(e) => handleMaterialChange(index, e)}
                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
                                     />

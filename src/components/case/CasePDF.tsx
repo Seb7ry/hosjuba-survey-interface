@@ -1,202 +1,159 @@
 import { useEffect, useState } from "react";
-import { Document, Page, pdfjs } from "react-pdf";
-import { FaTimes, FaDownload, FaPrint, FaExpand } from "react-icons/fa";
-import "react-pdf/dist/esm/Page/AnnotationLayer.css";
-import "react-pdf/dist/esm/Page/TextLayer.css";
-
-// Configuración del worker de PDF.js
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import { generatePreventivePdf, generateCorrectivePdf } from "../../services/pdf.service";
+import { Dialog, Transition } from "@headlessui/react";
+import { FaTimes, FaDownload } from "react-icons/fa";
+import { useMediaQuery } from "react-responsive";
 
 interface CasePDFProps {
-    pdfUrl: string;
+    isOpen: boolean;
     onClose: () => void;
     caseNumber: string;
+    typeCase: "Mantenimiento" | "Preventivo";
 }
 
-const CasePDF = ({ pdfUrl, onClose, caseNumber }: CasePDFProps) => {
-    const [numPages, setNumPages] = useState<number | null>(null);
-    const [pageNumber, setPageNumber] = useState(1);
-    const [scale, setScale] = useState(1);
-    const [isMobile, setIsMobile] = useState(false);
-    const [isFullscreen, setIsFullscreen] = useState(false);
+const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
+    const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
 
     useEffect(() => {
-        const checkIfMobile = () => {
-            setIsMobile(window.innerWidth < 768);
+        if (!isOpen) {
+            if (pdfUrl) {
+                URL.revokeObjectURL(pdfUrl);
+                setPdfUrl(null);
+            }
+            return;
+        }
+
+        const fetchPdf = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const response = await (typeCase === "Preventivo"
+                    ? generatePreventivePdf(caseNumber)
+                    : generateCorrectivePdf(caseNumber));
+
+                if (isMobile) {
+                    onClose();
+                    return;
+                }
+
+                const blob = new Blob([response], { type: "application/pdf" });
+                const url = URL.createObjectURL(blob);
+                setPdfUrl(url);
+            } catch (err) {
+                console.error("Error al generar PDF:", err);
+                setError("No se pudo cargar el PDF. Por favor, intente nuevamente.");
+            } finally {
+                setLoading(false);
+            }
         };
 
-        checkIfMobile();
-        window.addEventListener("resize", checkIfMobile);
+        fetchPdf();
 
         return () => {
-            window.removeEventListener("resize", checkIfMobile);
+            if (pdfUrl) {
+                URL.revokeObjectURL(pdfUrl);
+            }
         };
-    }, []);
-
-    useEffect(() => {
-        if (isMobile) {
-            // Si es móvil, abrir en nueva pestaña y cerrar el modal
-            window.open(pdfUrl, "_blank");
-            onClose();
-        }
-    }, [isMobile, pdfUrl, onClose]);
-
-    const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-        setNumPages(numPages);
-    };
-
-    const goToPrevPage = () => {
-        if (pageNumber > 1) {
-            setPageNumber(pageNumber - 1);
-        }
-    };
-
-    const goToNextPage = () => {
-        if (numPages && pageNumber < numPages) {
-            setPageNumber(pageNumber + 1);
-        }
-    };
-
-    const zoomIn = () => {
-        setScale(scale + 0.1);
-    };
-
-    const zoomOut = () => {
-        if (scale > 0.5) {
-            setScale(scale - 0.1);
-        }
-    };
-
-    const toggleFullscreen = () => {
-        if (!isFullscreen) {
-            document.documentElement.requestFullscreen().catch((e) => {
-                console.error(`Error attempting to enable fullscreen: ${e.message}`);
-            });
-        } else {
-            document.exitFullscreen();
-        }
-        setIsFullscreen(!isFullscreen);
-    };
+    }, [isOpen, caseNumber, typeCase, isMobile]);
 
     const handleDownload = () => {
+        if (!pdfUrl) return;
+
         const link = document.createElement("a");
         link.href = pdfUrl;
-        link.download = `Caso-${caseNumber}.pdf`;
+        link.download = `caso-${caseNumber}.pdf`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     };
 
-    const handlePrint = () => {
-        const printWindow = window.open(pdfUrl, "_blank");
-        if (printWindow) {
-            printWindow.onload = () => {
-                printWindow.print();
-            };
-        }
-    };
-
-    if (isMobile) {
-        return null; // No renderizar nada en móvil ya que se abre en nueva pestaña
+    if (isMobile && isOpen) {
+        onClose();
+        return null;
     }
 
     return (
-        <div className="fixed inset-0 z-50 overflow-auto bg-black bg-opacity-70 flex items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
-                {/* Header */}
-                <div className="flex justify-between items-center p-4 border-b bg-gray-50 rounded-t-lg">
-                    <h3 className="text-lg font-semibold">Caso: {caseNumber}</h3>
-                    <div className="flex space-x-2">
-                        <button
-                            onClick={handleDownload}
-                            className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                            title="Descargar"
-                        >
-                            <FaDownload className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={handlePrint}
-                            className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                            title="Imprimir"
-                        >
-                            <FaPrint className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={toggleFullscreen}
-                            className="p-2 text-gray-600 hover:text-blue-600 transition-colors"
-                            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
-                        >
-                            <FaExpand className="w-5 h-5" />
-                        </button>
-                        <button
-                            onClick={onClose}
-                            className="p-2 text-gray-600 hover:text-red-600 transition-colors"
-                            title="Cerrar"
-                        >
-                            <FaTimes className="w-5 h-5" />
-                        </button>
+        <Transition appear show={isOpen} as="div">
+            <Dialog as="div" className="fixed inset-0 z-50" onClose={onClose}>
+                <div className="fixed inset-0 bg-black bg-opacity-50" />
+
+                <div className="fixed inset-0 flex items-center justify-center p-4">
+                    <div className="w-full max-w-7xl h-[90vh] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
+                        {/* Header */}
+                        <div className="flex justify-between items-center px-4 py-3 border-b bg-white z-10">
+                            <h3 className="text-lg font-medium text-gray-900">
+                                PDF del Caso {caseNumber}
+                            </h3>
+                            <div className="flex space-x-2">
+                                {pdfUrl && (
+                                    <button
+                                        onClick={handleDownload}
+                                        className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50"
+                                        title="Descargar PDF"
+                                    >
+                                        <FaDownload className="w-5 h-5" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={onClose}
+                                    className="p-2 text-gray-500 hover:text-gray-700 rounded-full hover:bg-gray-100"
+                                    title="Cerrar"
+                                >
+                                    <FaTimes className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Contenido */}
+                        <div className="flex-grow overflow-hidden">
+                            {loading && (
+                                <div className="flex justify-center items-center h-full">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
+                                    <span className="ml-3">Generando PDF...</span>
+                                </div>
+                            )}
+
+                            {error && (
+                                <div className="bg-red-50 border-l-4 border-red-500 p-4">
+                                    <div className="flex">
+                                        <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path
+                                                fillRule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                clipRule="evenodd"
+                                            />
+                                        </svg>
+                                        <p className="ml-3 text-sm text-red-700">{error}</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {pdfUrl && (
+                                <iframe
+                                    src={pdfUrl}
+                                    className="w-full h-full border-none"
+                                    title={`PDF del caso ${caseNumber}`}
+                                />
+                            )}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="p-4 border-t bg-gray-50 flex justify-end">
+                            <button
+                                onClick={onClose}
+                                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            >
+                                Cerrar
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                {/* PDF Viewer */}
-                <div className="flex-1 overflow-auto p-4">
-                    <Document
-                        file={pdfUrl}
-                        onLoadSuccess={onDocumentLoadSuccess}
-                        loading={<div className="text-center py-8">Cargando PDF...</div>}
-                        error={<div className="text-center py-8 text-red-500">Error al cargar el PDF</div>}
-                    >
-                        <Page
-                            pageNumber={pageNumber}
-                            scale={scale}
-                            renderTextLayer={false}
-                            renderAnnotationLayer={false}
-                            loading={<div className="text-center py-8">Cargando página...</div>}
-                        />
-                    </Document>
-                </div>
-
-                {/* Footer Controls */}
-                <div className="flex justify-between items-center p-4 border-t bg-gray-50 rounded-b-lg">
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={zoomOut}
-                            disabled={scale <= 0.5}
-                            className={`px-3 py-1 border rounded ${scale <= 0.5 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-                        >
-                            -
-                        </button>
-                        <span className="text-sm">{(scale * 100).toFixed(0)}%</span>
-                        <button
-                            onClick={zoomIn}
-                            className="px-3 py-1 border rounded hover:bg-gray-100"
-                        >
-                            +
-                        </button>
-                    </div>
-
-                    <div className="flex items-center space-x-4">
-                        <button
-                            onClick={goToPrevPage}
-                            disabled={pageNumber <= 1}
-                            className={`px-3 py-1 border rounded ${pageNumber <= 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-                        >
-                            Anterior
-                        </button>
-                        <span className="text-sm">
-                            Página {pageNumber} de {numPages || "?"}
-                        </span>
-                        <button
-                            onClick={goToNextPage}
-                            disabled={!!(numPages && pageNumber >= numPages)}
-                            className={`px-3 py-1 border rounded ${numPages && pageNumber >= numPages ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-100"}`}
-                        >
-                            Siguiente
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+            </Dialog>
+        </Transition>
     );
 };
 
