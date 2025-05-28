@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaFileAlt, FaStar } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaFileAlt, FaStar, FaEye } from "react-icons/fa";
 import type { Case } from '../../../pages/CaseU';
 import CaseUCard from './CaseUCard';
 import { formatDateTime } from "../../Utils";
 import CaseURating from './CaseURating';
 import { updateCase, getCaseByNumber } from '../../../services/case.service';
 import SuccessDialog from '../../SuccessDialog';
+import CasePDF from '../CasePDF'; 
 
 interface CaseUListProps {
   cases: Case[];
@@ -33,9 +34,11 @@ const CaseUList = ({
 }: CaseUListProps) => {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [selectedCaseNumber, setSelectedCaseNumber] = useState('');
+  const [selectedCaseType, setSelectedCaseType] = useState<'preventive' | 'corrective'>('preventive');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [localCases, setLocalCases] = useState<Case[]>(cases);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showPdfModal, setShowPdfModal] = useState(false);
   const user = sessionStorage.getItem("username")?.toString();
   const username = user || "";
 
@@ -48,9 +51,18 @@ const CaseUList = ({
     return localCases.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  const handleRateClick = (numero: string) => {
+  const handleRateClick = (numero: string, tipoServicio: string) => {
     setSelectedCaseNumber(numero);
+    const typeCase = tipoServicio.toLowerCase().includes('preventivo') ? 'preventive' : 'corrective';
+    setSelectedCaseType(typeCase);
     setRatingModalOpen(true);
+  };
+
+  const handleViewDocument = (numero: string, tipoServicio: string) => {
+    setSelectedCaseNumber(numero);
+    const typeCase = tipoServicio.toLowerCase().includes('preventivo') ? 'preventive' : 'corrective';
+    setSelectedCaseType(typeCase);
+    setShowPdfModal(true);
   };
 
   const handleSubmitRating = async (ratings: { satisfaction: number; effectiveness: number }, signature: string) => {
@@ -96,12 +108,12 @@ const CaseUList = ({
       });
 
       setRatingModalOpen(false);
+      setShowSuccessMessage(true);
     } catch (error) {
       console.error('Error al calificar el caso:', error);
       alert('Error al enviar la calificación. Por favor intente nuevamente.');
     } finally {
       setIsSubmitting(false);
-      setRatingModalOpen(false);
     }
   };
 
@@ -133,40 +145,40 @@ const CaseUList = ({
                     <td className="px-6 py-4">{item.tecnico}</td>
                     <td className="px-6 py-4">{item.dependencia}</td>
                     <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.estado === 'Completado'
-                        ? 'bg-green-100 text-green-800'
-                        : item.estado === 'En progreso'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-red-100 text-red-800'
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.estado === 'Completado' ? 'bg-green-100 text-green-800' :
+                        item.estado === 'En progreso' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
                         }`}>
                         {item.estado}
                       </span>
                     </td>
                     <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
                     <td className="px-6 py-4">
-                      <button
-                        onClick={() => !item.rated && handleRateClick(item.numero)}
-                        disabled={item.rated}
-                        className={`py-1.5 px-3 border rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${item.rated
-                          ? 'border-green-200 bg-green-100 text-green-700 hover:bg-green-200 cursor-default'
-                          : !item.toRating
-                            ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
-                            : 'border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 hover:border-yellow-300'
-                          }`}
-                        title={item.rated ? "Documento calificado" : !item.toRating ? "Este caso ya fue calificado" : "Calificar servicio"}
-                      >
-                        {item.rated ? (
-                          <>
-                            <FaFileAlt className="w-4 h-4" />
-                            <span>Documento</span>
-                          </>
-                        ) : (
-                          <>
-                            <FaStar className="w-4 h-4" />
-                            <span>Calificar</span>
-                          </>
-                        )}
-                      </button>
+                      {item.rated ? (
+                        <button
+                          onClick={() => handleViewDocument(item.numero, item.tipoServicio)}
+                          className="py-1.5 px-3 border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
+                          title="Ver documento del servicio"
+                        >
+                          <FaEye className="w-4 h-4" />
+                          <span>Documento</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => handleRateClick(item.numero, item.tipoServicio)}
+                          disabled={!item.toRating}
+                          className={`py-1.5 px-3 border rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${!item.toRating ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' :
+                            'border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 hover:border-yellow-300'
+                            }`}
+                          title={
+                            !item.toRating ? "Este caso no requiere calificación" :
+                              "Calificar servicio"
+                          }
+                        >
+                          <FaStar className="w-4 h-4" />
+                          <span>Calificar</span>
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))
@@ -187,7 +199,8 @@ const CaseUList = ({
               <CaseUCard
                 key={item.numero}
                 item={item}
-                onRateClick={handleRateClick}
+                onRateClick={() => handleRateClick(item.numero, item.tipoServicio)}
+                onViewDocument={() => handleViewDocument(item.numero, item.tipoServicio)}
                 isRatingDisabled={!item.toRating}
               />
             ))
@@ -205,14 +218,16 @@ const CaseUList = ({
             <button
               onClick={onPrevPage}
               disabled={currentPage === 1}
-              className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
             >
               Anterior
             </button>
             <button
               onClick={onNextPage}
               disabled={currentPage === totalPages}
-              className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+              className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
+                }`}
             >
               Siguiente
             </button>
@@ -230,7 +245,8 @@ const CaseUList = ({
                 <button
                   onClick={onPrevPage}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
                 >
                   <span className="sr-only">Anterior</span>
                   <FaChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -239,7 +255,10 @@ const CaseUList = ({
                   <button
                     key={page}
                     onClick={() => onPageChange(page)}
-                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page ? 'z-10 bg-blue-50 border-blue-500 text-blue-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'}`}
+                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${currentPage === page
+                      ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                      : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                      }`}
                   >
                     {page}
                   </button>
@@ -247,7 +266,8 @@ const CaseUList = ({
                 <button
                   onClick={onNextPage}
                   disabled={currentPage === totalPages}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
                 >
                   <span className="sr-only">Siguiente</span>
                   <FaChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -265,15 +285,23 @@ const CaseUList = ({
         isSubmitting={isSubmitting}
         username={username}
         caseNumber={selectedCaseNumber}
+        typeCase={selectedCaseType}
         onSuccess={() => setShowSuccessMessage(true)}
       />
 
-      {showSuccessMessage && (
-        <SuccessDialog
-          isOpen={showSuccessMessage}
-          message="La calificación fue enviada correctamente."
+      <SuccessDialog
+        isOpen={showSuccessMessage}
+        message="La calificación fue enviada correctamente."
+        caseNumber={selectedCaseNumber}
+        onClose={() => setShowSuccessMessage(false)}
+      />
+
+      {selectedCaseNumber && (
+        <CasePDF
+          isOpen={showPdfModal}
+          onClose={() => setShowPdfModal(false)}
           caseNumber={selectedCaseNumber}
-          onClose={() => setShowSuccessMessage(false)}
+          typeCase={selectedCaseType === 'preventive' ? 'Preventivo' : 'Mantenimiento'}
         />
       )}
     </>

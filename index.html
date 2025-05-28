@@ -2,28 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
     <title>Sistema de Soporte TI Hosjuba</title>
-
-    <link id="favicon" rel="icon" type="image/svg+xml" href="/icons/logo.png" />
-
-    <script>
-      // Detectar modo oscuro o claro
-      const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const favicon = document.getElementById('favicon');
-
-      if (isDarkMode) {
-        favicon.href = '/icons/logo-hosjuba.png';
-      } else {
-        favicon.href = '/icons/logo.png';
-      }
-
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        const newFavicon = e.matches ? '/icons/logo-hosjuba.png' : '/icons/logo.png';
-        favicon.href = newFavicon;
-      });
-    </script>
   </head>
   <body>
     <div id="root"></div>

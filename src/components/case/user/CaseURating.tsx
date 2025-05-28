@@ -1,10 +1,11 @@
 import { useEffect, useState, type ChangeEvent } from 'react';
 import { X } from 'lucide-react';
 import { SignatureField } from '../../signature/SignatureField';
-import { FaStar } from 'react-icons/fa';
+import { FaStar, FaEye } from 'react-icons/fa';
 import { getUserByUsername } from '../../../services/user.service';
 import SignaturePadModal from '../../signature/SignatureModal';
 import ConfirmDialog from '../../ConfirmDialog';
+import CasePDF from '../CasePDF';
 
 interface RatingModalProps {
     isOpen: boolean;
@@ -13,10 +14,20 @@ interface RatingModalProps {
     isSubmitting?: boolean;
     username: string;
     onSuccess?: () => void;
-    caseNumber?: string; 
+    caseNumber?: string;
+    typeCase?: 'preventive' | 'corrective';
 }
 
-const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username, onSuccess  }: RatingModalProps) => {
+const CaseURating = ({
+    isOpen,
+    onClose,
+    onSubmit,
+    isSubmitting = false,
+    username,
+    onSuccess,
+    caseNumber,
+    typeCase
+}: RatingModalProps) => {
     const [satisfaction, setSatisfaction] = useState(0);
     const [effectiveness, setEffectiveness] = useState(0);
     const [signature, setSignature] = useState('');
@@ -25,26 +36,40 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
     const [, setShowSuccessDialog] = useState(false);
+    const [showPdfModal, setShowPdfModal] = useState(false);
+    const [, setIsLoadingPdf] = useState(false);
+    const [, setPdfError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!isOpen) return;
 
-        const fetchSignature = async () => {
+        const fetchData = async () => {
             try {
                 const user = await getUserByUsername(username);
-                if (user.signature) {
-                    setSignature(user.signature);
-                } else {
-                    setSignature('');
-                }
+                setSignature(user.signature || '');
             } catch (error) {
-                console.error('Error al cargar firma del usuario:', error);
+                console.error('Error al cargar datos:', error);
                 setSignature('');
             }
         };
 
-        fetchSignature();
+        fetchData();
     }, [isOpen, username]);
+
+    const handleViewDocument = async () => {
+        if (!caseNumber || !typeCase) return;
+
+        try {
+            setIsLoadingPdf(true);
+            setPdfError(null);
+            setShowPdfModal(true);
+        } catch (error) {
+            console.error('Error al cargar PDF:', error);
+            setPdfError('Error al cargar el documento del servicio');
+        } finally {
+            setIsLoadingPdf(false);
+        }
+    };
 
     if (!isOpen) return null;
 
@@ -99,7 +124,7 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
 
         try {
             await onSubmit({ satisfaction, effectiveness }, signature);
-            setShowSuccessDialog(false); 
+            setShowSuccessDialog(false);
             onSuccess?.();
         } catch (error) {
             console.error('Error al enviar la calificación:', error);
@@ -141,12 +166,19 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
 
                     <div className="p-6 space-y-6">
                         <div className="border border-gray-200 rounded-lg overflow-hidden">
-                            <div className="bg-gray-50 p-3 border-b border-gray-200">
+                            <div className="bg-gray-50 p-3 border-b border-gray-200 flex justify-between items-center">
                                 <h3 className="text-sm font-medium text-gray-700">Documento del servicio</h3>
+                                {caseNumber && typeCase && (
+                                    <button
+                                        onClick={handleViewDocument}
+                                        className="flex items-center space-x-1 text-sm text-blue-600 hover:text-blue-800 px-3 py-1 rounded-md hover:bg-blue-50 transition-colors"
+                                    >
+                                        <FaEye className="w-4 h-4" />
+                                        <span>Visualizar documento</span>
+                                    </button>
+                                )}
                             </div>
-                            <div className="h-64 bg-gray-100 flex items-center justify-center">
-                                <p className="text-gray-500">Vista previa del PDF del servicio (estático)</p>
-                            </div>
+                            
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -230,6 +262,15 @@ const CaseURating = ({ isOpen, onClose, onSubmit, isSubmitting = false, username
                 onConfirm={confirmSubmit}
                 isProcessing={isSubmitting}
             />
+
+            {caseNumber && typeCase && (
+                <CasePDF
+                    isOpen={showPdfModal}
+                    onClose={() => setShowPdfModal(false)}
+                    caseNumber={caseNumber}
+                    typeCase={typeCase === 'preventive' ? 'Preventivo' : 'Mantenimiento'}
+                />
+            )}
         </>
     );
 };
