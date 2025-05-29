@@ -1,5 +1,6 @@
 import { useRef, type ChangeEvent } from 'react';
 import { Upload, Edit2, X } from 'lucide-react';
+import { ErrorMessage } from '../ErrorMessage';
 
 type SignatureFieldProps = {
   signature?: string;
@@ -7,6 +8,9 @@ type SignatureFieldProps = {
   onDraw: () => void;
   onChange: (signature: string) => void;
   onRemove: () => void;
+  isRequired?: boolean;
+  error?: string;
+  onError?: (message: string) => void;
 };
 
 export const SignatureField = ({
@@ -14,14 +18,43 @@ export const SignatureField = ({
   onUpload,
   onDraw,
   onRemove,
+  isRequired = false,
+  error,
+  onError,
 }: SignatureFieldProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const handleUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.match('image.*')) {
+      onError?.('Por favor, sube solo imágenes (JPEG, PNG)');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      onError?.('La imagen no debe superar los 2MB');
+      return;
+    }
+
+    onUpload(e);
+  };
+
   return (
-    <div>
+    <div className="space-y-2">
+      {error && (
+        <div className="mb-2">
+          <ErrorMessage
+            message={error}
+            onClose={() => onError?.('')}
+          />
+        </div>
+      )}
+
       {signature ? (
         <div className="mt-2 space-y-2">
-          <div className="flex items-center justify-center p-2 border border-gray-300 rounded-md">
+          <div className="flex items-center justify-center p-2 border border-gray-300 rounded-md bg-white">
             <img
               src={signature}
               alt="Firma del usuario"
@@ -47,6 +80,11 @@ export const SignatureField = ({
         </div>
       ) : (
         <div className="space-y-2">
+          <div className="w-full px-3 py-8 border border-gray-300 rounded-md bg-gray-50 text-center">
+            <p className={`text-sm ${isRequired ? 'text-red-500 font-medium' : 'text-gray-400'}`}>
+              {isRequired ? 'Firma requerida*' : 'No hay firma registrada'}
+            </p>
+          </div>
           <div className="flex gap-2">
             <button
               type="button"
@@ -66,11 +104,15 @@ export const SignatureField = ({
           <input
             type="file"
             ref={fileInputRef}
-            onChange={onUpload}
-            accept="image/*"
+            onChange={handleUpload}
+            accept="image/jpeg,image/png"
             className="hidden"
           />
         </div>
+      )}
+
+      {isRequired && !signature && (
+        <p className="text-xs text-red-500 mt-1">Debes agregar una firma para continuar</p>
       )}
     </div>
   );

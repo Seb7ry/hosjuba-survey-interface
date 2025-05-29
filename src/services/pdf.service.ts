@@ -8,17 +8,31 @@ const getToken = () => {
     return token ? `Bearer ${token}` : '';
 };
 
-const headers = () => ({
-    headers: {
+//const headers = () => ({
+//    headers: {
+//        Authorization: getToken(),
+//'Content-Type': 'application/json',
+//    },
+//});
+
+const headers = (hasBody = false) => {
+    const baseHeaders: any = {
         Authorization: getToken(),
-        'Content-Type': 'application/json',
-    },
-});
+    };
+
+    if (hasBody) {
+        baseHeaders['Content-Type'] = 'application/json';
+    }
+
+    return { headers: baseHeaders };
+};
+
 
 export const generatePreventivePdf = async (caseNumber: string): Promise<Blob> => {
     const response = await axios.post(
         `${API_URL}/pdf/preventive/${caseNumber}`,
-        {},
+        //{},
+        null,
         {
             ...headers(),
             responseType: 'blob',
@@ -31,12 +45,13 @@ export const generatePreventivePdf = async (caseNumber: string): Promise<Blob> =
 export const generateCorrectivePdf = async (caseNumber: string): Promise<Blob> => {
     const response = await axios.post(
         `${API_URL}/pdf/corrective/${caseNumber}`,
-        {},
+        //{},
+        null,
         {
             ...headers(),
             responseType: 'blob',
         }
     );
     await refreshSession(sessionStorage.getItem('username') || '');
-    return response.data; 
+    return response.data;
 };

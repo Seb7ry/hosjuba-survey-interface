@@ -23,6 +23,8 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [, setCreatedCaseNumber] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [validateForm, setValidateForm] = useState(false);
+  const [, setFormError] = useState<string | null>(null);
 
   const { numberCase } = useParams();
   const isEditMode = !!numberCase && !numberCase.includes("new");
@@ -42,6 +44,18 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
     loadCase();
   }, [isEditMode, numberCase, setFormData]);
+
+  const validateFormBeforeSubmit = () => {
+    setValidateForm(true);
+
+    if (!formData.assignedTechnician?.signature) {
+      setFormError("Debe registrar la firma del técnico antes de guardar");
+      return false;
+    }
+
+    setFormError(null);
+    return true;
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> | CustomChangeEvent
@@ -73,7 +87,6 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
         }
 
         current[keys[keys.length - 1]] = finalValue;
-        console.log("🔧 Nuevo estado:", newState);
         return newState;
       });
     } else {
@@ -86,6 +99,11 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateFormBeforeSubmit()) {
+      return;
+    }
+
     setShowConfirmDialog(true);
   };
 
@@ -223,7 +241,10 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
               handleChange={handleChange}
               setFormData={setFormData}
               isPreventive={isPreventive}
-            />
+              validateForm={validateForm}
+              setValidateForm={setValidateForm} onSave={function (): void {
+                throw new Error("Function not implemented.");
+              } }            />
             <BodyForm
               formData={formData}
               handleChange={handleChange}

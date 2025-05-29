@@ -1,0 +1,8 @@
+node_modules
+dist
+Dockerfile
+nginx.conf
+.env.local
+.git
+.gitignore
+*.log

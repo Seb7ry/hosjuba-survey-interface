@@ -6,6 +6,7 @@ import { getUserByUsername } from '../../../services/user.service';
 import SignaturePadModal from '../../signature/SignatureModal';
 import ConfirmDialog from '../../ConfirmDialog';
 import CasePDF from '../CasePDF';
+import { ErrorMessage } from '../../ErrorMessage'; // Asegúrate de importar el componente ErrorMessage
 
 interface RatingModalProps {
     isOpen: boolean;
@@ -39,6 +40,7 @@ const CaseURating = ({
     const [showPdfModal, setShowPdfModal] = useState(false);
     const [, setIsLoadingPdf] = useState(false);
     const [, setPdfError] = useState<string | null>(null);
+    const [validationError, setValidationError] = useState<string | null>(null); // Nuevo estado para errores de validación
 
     useEffect(() => {
         if (!isOpen) return;
@@ -78,6 +80,7 @@ const CaseURating = ({
         if (!file) return;
 
         if (!file.type.match('image.*')) {
+            setValidationError('Por favor, sube solo imágenes');
             return;
         }
 
@@ -86,14 +89,17 @@ const CaseURating = ({
             if (event.target?.result) {
                 const base64String = event.target.result as string;
                 setSignature(base64String);
+                setValidationError(null); // Limpiar error al subir firma
             }
         };
+        reader.onerror = () => setValidationError('Error al cargar la imagen');
         reader.readAsDataURL(file);
     };
 
     const handleSaveSignature = (signature: string) => {
         setSignature(signature);
         setIsSignatureModalOpen(false);
+        setValidationError(null); // Limpiar error al guardar firma
     };
 
     const removeSignature = () => {
@@ -101,13 +107,15 @@ const CaseURating = ({
     };
 
     const validateForm = () => {
+        setValidationError(null); // Limpiar errores previos
+
         if (satisfaction === 0 || effectiveness === 0) {
-            alert('Por favor califique ambos aspectos');
+            setValidationError('Por favor califique ambos aspectos');
             return false;
         }
 
         if (!signature) {
-            alert('Por favor agregue su firma');
+            setValidationError('Por favor agregue su firma para confirmar');
             return false;
         }
 
@@ -128,7 +136,7 @@ const CaseURating = ({
             onSuccess?.();
         } catch (error) {
             console.error('Error al enviar la calificación:', error);
-            alert('Ocurrió un error al enviar la calificación');
+            setValidationError('Ocurrió un error al enviar la calificación');
         }
     };
 
@@ -165,6 +173,13 @@ const CaseURating = ({
                     </div>
 
                     <div className="p-6 space-y-6">
+                        {/* Mostrar mensaje de error si existe */}
+                        {validationError && (
+                            <ErrorMessage
+                                message={validationError}
+                                onClose={() => setValidationError(null)}
+                            />
+                        )}
                         <div className="border border-gray-200 rounded-lg overflow-hidden">
                             <div className="bg-gray-50 p-3 border-b border-gray-200 flex justify-between items-center">
                                 <h3 className="text-sm font-medium text-gray-700">Documento del servicio</h3>
@@ -178,7 +193,7 @@ const CaseURating = ({
                                     </button>
                                 )}
                             </div>
-                            
+
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -224,6 +239,7 @@ const CaseURating = ({
                                 onDraw={() => setIsSignatureModalOpen(true)}
                                 onChange={setSignature}
                                 onRemove={removeSignature}
+                                isRequired={true}
                             />
                         </div>
 

@@ -10,9 +10,11 @@ interface TechnicianInfoProps {
     handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
     setFormData: React.Dispatch<React.SetStateAction<any>>;
     isPreventive: boolean;
+    validateForm: boolean;
+    setValidateForm: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
+const TechnicianInfo = ({ formData, setFormData, validateForm, setValidateForm }: TechnicianInfoProps) => {
     const [users, setUsers] = useState<UserData[]>([]);
     const [filteredUsersById, setFilteredUsersById] = useState<UserData[]>([]);
     const [filteredUsersByName, setFilteredUsersByName] = useState<UserData[]>([]);
@@ -26,6 +28,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
         type: 'upload' | 'draw' | 'remove' | 'change';
         data?: string;
     } | null>(null);
+    const [signatureError, setSignatureError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const isTechnicianSelected = () => {
@@ -54,6 +57,22 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
 
         loadUsers();
     }, []);
+
+    useEffect(() => {
+        if (validateForm) {
+            validateSignature();
+            setValidateForm(false);
+        }
+    }, [validateForm, setValidateForm]);
+
+    const validateSignature = () => {
+        if (!formData.assignedTechnician?.signature) {
+            setSignatureError('La firma del técnico es obligatoria');
+            return false;
+        }
+        setSignatureError(null);
+        return true;
+    };
 
     const showError = (message: string) => {
         setError(message);
@@ -117,6 +136,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
         });
         setShowDropdownById(false);
         setShowDropdownByName(false);
+        setSignatureError(null);
     };
 
     const handleSignatureUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -190,6 +210,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
             setUsers(updatedUsers);
             setFilteredUsersById(updatedUsers);
             setFilteredUsersByName(updatedUsers);
+            setSignatureError(null);
 
         } catch (err: any) {
             showError(err.response?.data?.message || 'Error al actualizar la firma');
@@ -308,7 +329,7 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
                     </div>
                 </div>
 
-                {/* Visualización de Firma (solo para correctivo) */}
+                {/* Visualización de Firma */}
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Firma</label>
                     {formData.assignedTechnician.signature ? (
@@ -377,6 +398,9 @@ const TechnicianInfo = ({ formData, setFormData }: TechnicianInfoProps) => {
                                 disabled={!isTechnicianSelected()}
                             />
                         </div>
+                    )}
+                    {signatureError && (
+                        <ErrorMessage message={signatureError} onClose={() => setSignatureError(null)} />
                     )}
                 </div>
             </div>
