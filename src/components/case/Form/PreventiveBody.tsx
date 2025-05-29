@@ -1,122 +1,69 @@
-import { formatLabel } from "../../Utils";
-import GroupItem from "../../GroupItem";
 import React from "react";
+import GroupItem from "../../GroupItem";
+import { formatLabel } from "../../Utils";
 
 interface PreventiveBodyProps {
-    formData: any;
+    formData: {
+        serviceData: Record<string, Record<string, { enabled: boolean; value: boolean }>>;
+    };
     handleCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    handleEnableToggle: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const PreventiveBody = React.memo(({ formData, handleCheckboxChange }: PreventiveBodyProps) => {
-    const checkboxStyle = "h-5 w-5 min-h-[20px] min-w-[20px] text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mr-2";
+const PreventiveBody = React.memo(({ formData, handleCheckboxChange, handleEnableToggle }: PreventiveBodyProps) => {
+    const enabledCheckboxStyle = "h-5 w-5 min-h-[20px] min-w-[20px] text-yellow-500 focus:ring-yellow-500 border-gray-300 rounded mr-2";
+    const valueCheckboxStyle = "h-5 w-5 min-h-[20px] min-w-[20px] text-blue-600 focus:ring-blue-500 border-gray-300 rounded mr-2";
+    const disabledCheckboxStyle = "h-5 w-5 min-h-[20px] min-w-[20px] text-gray-400 focus:ring-gray-500 border-gray-300 rounded mr-2 cursor-not-allowed";
     const labelStyle = "block text-sm text-gray-700";
-    const itemStyle = "flex items-center p-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50";
+    const itemStyle = "flex items-center justify-between p-2 bg-white rounded-lg border border-gray-200 hover:bg-gray-50";
+
+    const renderItems = (sectionKey: string, sectionData: Record<string, { enabled: boolean; value: boolean }>) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {Object.entries(sectionData).map(([key, { enabled, value }]) => (
+                <div key={`${sectionKey}-${key}`} className={itemStyle}>
+                    <div className="flex items-center space-x-2">
+                        <input
+                            type="checkbox"
+                            name={`serviceData.${sectionKey}.${key}.enabled`}
+                            checked={enabled}
+                            onChange={handleEnableToggle}
+                            className={enabledCheckboxStyle}
+                            id={`enabled-${sectionKey}-${key}`}
+                        />
+                        <input
+                            type="checkbox"
+                            name={`serviceData.${sectionKey}.${key}.value`}
+                            checked={value}
+                            disabled={!enabled}
+                            onChange={handleCheckboxChange}
+                            className={enabled ? valueCheckboxStyle : disabledCheckboxStyle}
+                            id={`value-${sectionKey}-${key}`}
+                        />
+                    </div>
+                    <label htmlFor={`enabled-${sectionKey}-${key}`} className={labelStyle}>
+                        {formatLabel(key)}
+                    </label>
+                </div>
+            ))}
+        </div>
+    );
 
     return (
         <div className="space-y-6">
-            {/* Sección de mantenimiento de hardware */}
             <GroupItem title="Mantenimiento de Hardware (Computadores)">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {Object.entries(formData.serviceData.hardware).map(([key, value]) => (
-                        <div key={`hardware-${key}`} className={itemStyle}>
-                            <input
-                                type="checkbox"
-                                id={`hardware-${key}`}
-                                name={`serviceData.hardware.${key}`}
-                                checked={value as boolean}
-                                onChange={handleCheckboxChange}
-                                className={checkboxStyle}
-                            />
-                            <label htmlFor={`hardware-${key}`} className={labelStyle}>
-                                {formatLabel(key)}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {renderItems("hardware", formData.serviceData.hardware)}
             </GroupItem>
-
-            {/* Sección de mantenimiento de software */}
             <GroupItem title="Mantenimiento de Software (Computadores)">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {Object.entries(formData.serviceData.software).map(([key, value]) => (
-                        <div key={`software-${key}`} className={itemStyle}>
-                            <input
-                                type="checkbox"
-                                id={`software-${key}`}
-                                name={`serviceData.software.${key}`}
-                                checked={value as boolean}
-                                onChange={handleCheckboxChange}
-                                className={checkboxStyle}
-                            />
-                            <label htmlFor={`software-${key}`} className={labelStyle}>
-                                {formatLabel(key)}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {renderItems("software", formData.serviceData.software)}
             </GroupItem>
-
-            {/* Sección de impresoras */}
             <GroupItem title="Mantenimiento de Impresoras">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {Object.entries(formData.serviceData.printers).map(([key, value]) => (
-                        <div key={`printers-${key}`} className={itemStyle}>
-                            <input
-                                type="checkbox"
-                                id={`printers-${key}`}
-                                name={`serviceData.printers.${key}`}
-                                checked={value as boolean}
-                                onChange={handleCheckboxChange}
-                                className={checkboxStyle}
-                            />
-                            <label htmlFor={`printers-${key}`} className={labelStyle}>
-                                {formatLabel(key)}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {renderItems("printers", formData.serviceData.printers)}
             </GroupItem>
-
-            {/* Sección de teléfonos */}
             <GroupItem title="Mantenimiento de Teléfonos">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {Object.entries(formData.serviceData.phones).map(([key, value]) => (
-                        <div key={`phones-${key}`} className={itemStyle}>
-                            <input
-                                type="checkbox"
-                                id={`phones-${key}`}
-                                name={`serviceData.phones.${key}`}
-                                checked={value as boolean}
-                                onChange={handleCheckboxChange}
-                                className={checkboxStyle}
-                            />
-                            <label htmlFor={`phones-${key}`} className={labelStyle}>
-                                {formatLabel(key)}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {renderItems("phones", formData.serviceData.phones)}
             </GroupItem>
-
-            {/* Sección de escáneres */}
             <GroupItem title="Mantenimiento de Escáneres">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                    {Object.entries(formData.serviceData.scanners).map(([key, value]) => (
-                        <div key={`scanners-${key}`} className={itemStyle}>
-                            <input
-                                type="checkbox"
-                                id={`scanners-${key}`}
-                                name={`serviceData.scanners.${key}`}
-                                checked={value as boolean}
-                                onChange={handleCheckboxChange}
-                                className={checkboxStyle}
-                            />
-                            <label htmlFor={`scanners-${key}`} className={labelStyle}>
-                                {formatLabel(key)}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {renderItems("scanners", formData.serviceData.scanners)}
             </GroupItem>
         </div>
     );

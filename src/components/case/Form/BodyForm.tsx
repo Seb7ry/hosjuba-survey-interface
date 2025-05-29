@@ -1,10 +1,12 @@
 import CorrectiveBody from "./CorrectiveBody";
 import PreventiveBody from "./PreventiveBody";
 
+
 export type CustomChangeEvent = {
   target: {
     name: string;
-    value: string;
+    value: string | boolean;
+    type?: string;
   };
 };
 
@@ -27,13 +29,30 @@ const BodyForm = ({ formData, handleChange, isPreventive }: BodyFormProps) => {
   }
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleChange(e);
+    handleChange({
+      target: {
+        name: e.target.name,
+        value: e.target.checked,
+        type: e.target.type
+      }
+    });
+  };
+
+  const handleEnableToggle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    handleChange({
+      target: {
+        name: e.target.name,
+        value: e.target.checked,
+        type: e.target.type
+      }
+    });
   };
 
   return (
     <PreventiveBody
       formData={formData}
       handleCheckboxChange={handleCheckboxChange}
+      handleEnableToggle={handleEnableToggle}
     />
   );
 };

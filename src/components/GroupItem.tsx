@@ -25,9 +25,8 @@ const GroupItem = ({ title, children, defaultOpen = false }: GroupItemProps) => 
         )}
       </button>
       <div
-        className={`bg-gray-50 transition-all duration-300 overflow-hidden ${
-          isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
-        }`}
+        className={`bg-gray-50 transition-all duration-300 overflow-hidden ${isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          }`}
       >
         <div className="p-4">{children}</div>
       </div>
