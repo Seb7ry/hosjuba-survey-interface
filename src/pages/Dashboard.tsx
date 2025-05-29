@@ -4,12 +4,10 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  // Obtener departamento del usuario desde sessionStorage
   const department = typeof window !== 'undefined' ? sessionStorage.getItem('department') : null;
   const isSystems = department === 'Sistemas';
   const navigate = useNavigate();
 
-  // Configuración de tarjetas con rutas
   const systemCards = [
     {
       id: 1,
@@ -80,12 +78,10 @@ const Dashboard = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Sidebar lateral */}
       <div className="md:block md:w-64 flex-shrink-0">
         <Sidebar />
       </div>
 
-      {/* Contenido principal */}
       <main className="flex-1">
         <div className="h-16 md:h-0"></div>
 

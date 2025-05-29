@@ -116,7 +116,7 @@ const Report = () => {
                             <label className="block text-sm font-medium text-gray-700 mb-1">Semestre</label>
                             <select
                                 className="w-full p-2 border border-gray-300 rounded-md"
-                                value={month} // Reutilizamos month para el semestre
+                                value={month}
                                 onChange={(e) => setMonth(e.target.value)}
                             >
                                 <option value="1">Primer semestre (Ene-Jun)</option>
@@ -274,7 +274,6 @@ const Report = () => {
                                 {renderDateInputs()}
                             </div>
 
-                            {/* Panel de descarga con botón grande */}
                             <div className="flex flex-col justify-center items-center">
                                 <button
                                     onClick={handleGenerateReport}
@@ -293,7 +292,6 @@ const Report = () => {
                                     {loading ? 'Generando...' : 'Descargar Reporte'}
                                 </p>
 
-                                {/* Barra de progreso */}
                                 {loading && (
                                     <div className="w-48 h-2 bg-gray-200 rounded-full mt-4">
                                         <div

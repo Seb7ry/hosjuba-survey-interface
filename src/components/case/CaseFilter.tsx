@@ -70,12 +70,10 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                 setUsers(filteredUsers);
                 setFilteredTechnicians(filteredUsers);
                 
-                // Cargar equipos
                 const equipmentsData = await getAllEquipment();
                 setEquipments(equipmentsData);
                 setFilteredEquipments(equipmentsData);
                 
-                // Cargar dependencias
                 const departmentsData = await getAllDepartments();
                 setDepartments(departmentsData);
                 setFilteredDepartments(departmentsData);
@@ -431,7 +429,6 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                 </div>
 
                 <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    {/* Botones de acción (Buscar y Limpiar) */}
                     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                         <button
                             type="submit"
@@ -452,8 +449,7 @@ const CaseFilter = ({ onFilter, loading, typeCase }: CaseFilterProps) => {
                             Limpiar
                         </button>
                     </div>
-
-                    {/* Botón de más filtros */}
+                    
                     <button
                         type="button"
                         onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}

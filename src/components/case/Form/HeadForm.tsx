@@ -34,7 +34,6 @@ const HeadForm = ({ formData, handleChange, setFormData, isPreventive }: HeadFor
         isPreventive={isPreventive}
       />
 
-      {/* Sección de información del equipo - solo para preventivo */}
       {isPreventive && (
         <PreventiveInfo
           formData={formData}
@@ -43,12 +42,11 @@ const HeadForm = ({ formData, handleChange, setFormData, isPreventive }: HeadFor
         />
       )}
 
-      {/* Sección de información adicional para correctivo */}
       {!isPreventive && (
         <CorrectiveInfo
           formData={formData}
           handleChange={handleChange}
-          setFormData={setFormData} // ¡Este es el cambio importante!
+          setFormData={setFormData} 
         />
       )}
     </>

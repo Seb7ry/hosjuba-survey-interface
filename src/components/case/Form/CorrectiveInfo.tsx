@@ -19,7 +19,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
     const [showDropdownByName, setShowDropdownByName] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
 
-    // Cargar usuarios al montar el componente
     useEffect(() => {
         const loadUsers = async () => {
             setIsLoading(true);
@@ -43,7 +42,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
         loadUsers();
     }, []);
 
-    // Manejar cambio en el checkbox de escalamiento
     const handleEscalationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const requiresEscalation = e.target.checked;
         setFormData({
@@ -51,7 +49,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
             serviceData: {
                 ...formData.serviceData,
                 requiresEscalation,
-                // Resetear datos de escalamiento si se desmarca
                 escalationTechnician: requiresEscalation ? formData.serviceData.escalationTechnician : {
                     _id: "",
                     name: "",
@@ -65,7 +62,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
         setIsExpanded(requiresEscalation);
     };
 
-    // Manejar búsqueda por ID
     const handleEscalationIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setFormData({
@@ -91,7 +87,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
         }
     };
 
-    // Manejar búsqueda por Nombre
     const handleEscalationNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setFormData({
@@ -117,7 +112,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
         }
     };
 
-    // Seleccionar técnico de escalamiento
     const selectEscalationTechnician = (user: UserData) => {
         setFormData({
             ...formData,
@@ -129,7 +123,7 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                     position: user.position,
                     department: user.department,
                     signature: user.signature || '',
-                    level: formData.serviceData.escalationTechnician.level // Mantener el nivel si ya estaba seleccionado
+                    level: formData.serviceData.escalationTechnician.level
                 }
             }
         });
@@ -253,7 +247,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                     </div>
                 </div>
 
-                {/* Checkbox para habilitar escalamiento */}
                 <div className="md:col-span-2">
                     <div className="flex items-center">
                         <input
@@ -270,7 +263,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                     </div>
                 </div>
 
-                {/* Sección de escalamiento (aparece con animación) */}
                 <div
                     className={`md:col-span-2 transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}
                 >
@@ -278,7 +270,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                         <div className="mt-4 space-y-6 border-t pt-4">
                             <h3 className="text-lg font-medium text-gray-700">Escalamiento</h3>
 
-                            {/* Select para nivel de escalamiento */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Nivel de Escalamiento*</label>
                                 <select
@@ -301,7 +292,7 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                 >
                                     <option value="">Seleccione el nivel...</option>
                                     {serviceLevels
-                                        .filter(level => level !== formData.serviceData.level) // Filtrar el nivel actual
+                                        .filter(level => level !== formData.serviceData.level)
                                         .map((level) => (
                                             <option key={level} value={level}>
                                                 {level}
@@ -314,7 +305,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {/* Campo de búsqueda por ID */}
                                 <div className="relative">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">ID Técnico</label>
                                     <div className="relative">
@@ -360,7 +350,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     )}
                                 </div>
 
-                                {/* Campo de búsqueda por Nombre */}
                                 <div className="relative">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
                                     <div className="relative">
@@ -398,7 +387,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     )}
                                 </div>
 
-                                {/* Campo de Cargo (solo lectura) */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
                                     <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
@@ -406,7 +394,6 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     </div>
                                 </div>
 
-                                {/* Campo de Departamento (solo lectura) */}
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Departamento</label>
                                     <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">

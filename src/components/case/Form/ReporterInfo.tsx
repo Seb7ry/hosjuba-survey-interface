@@ -7,7 +7,7 @@ interface ReporterInfoProps {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps) => {
+const ReporterInfo = ({ formData, setFormData }: ReporterInfoProps) => {
   const [users, setUsers] = useState<UserData[]>([]);
   const [filteredUsersById, setFilteredUsersById] = useState<UserData[]>([]);
   const [filteredUsersByName, setFilteredUsersByName] = useState<UserData[]>([]);
@@ -130,7 +130,6 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
           )}
         </div>
 
-        {/* Campo de búsqueda por Nombre */}
         <div className="relative">
           <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
           <div className="relative">
@@ -165,7 +164,6 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
           )}
         </div>
 
-        {/* Campo de Cargo (solo lectura) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Cargo</label>
           <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
@@ -173,7 +171,6 @@ const ReporterInfo = ({ formData, handleChange, setFormData }: ReporterInfoProps
           </div>
         </div>
 
-        {/* Campo de Departamento (solo lectura) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Dependencia</label>
           <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">

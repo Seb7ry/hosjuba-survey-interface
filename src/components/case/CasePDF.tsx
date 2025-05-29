@@ -83,7 +83,6 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
 
                 <div className="fixed inset-0 flex items-center justify-center p-4">
                     <div className="w-full max-w-7xl h-[90vh] bg-white rounded-xl shadow-lg overflow-hidden flex flex-col">
-                        {/* Header */}
                         <div className="flex justify-between items-center px-4 py-3 border-b bg-white z-10">
                             <h3 className="text-lg font-medium text-gray-900">
                                 PDF del Caso {caseNumber}
@@ -108,7 +107,6 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                             </div>
                         </div>
 
-                        {/* Contenido */}
                         <div className="flex-grow overflow-hidden">
                             {loading && (
                                 <div className="flex justify-center items-center h-full">
@@ -141,7 +139,6 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                             )}
                         </div>
 
-                        {/* Footer */}
                         <div className="p-4 border-t bg-gray-50 flex justify-end">
                             <button
                                 onClick={onClose}

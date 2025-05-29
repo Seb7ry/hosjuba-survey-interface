@@ -137,7 +137,7 @@ const User = () => {
 
   const handleDeleteConfirmed = async () => {
     if (!userToDelete) return;
-    
+
     try {
       await deleteUser(userToDelete.username);
       const data = await getAllUsers();

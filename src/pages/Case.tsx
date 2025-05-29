@@ -44,16 +44,14 @@ const Case = () => {
 
     return (
         <div className="flex min-h-screen bg-gray-50 relative">
-            {/* Sidebar lateral */}
-             <div className="md:block md:w-64 flex-shrink-0">
+            <div className="md:block md:w-64 flex-shrink-0">
                 <Sidebar />
             </div>
 
-            {/* Contenido principal */}
             <main className="flex-1">
                 <div className="h-16 md:h-0"></div>
 
-               <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
+                <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
                     <h1 className="text-3xl font-semibold text-gray-800 mb-10 tracking-tight">
                         Selecciona un formulario
                     </h1>

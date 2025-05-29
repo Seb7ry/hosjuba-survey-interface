@@ -81,11 +81,6 @@ const Deleted = () => {
         loadDeletedCases();
     }, []);
 
-    const handleFilterChange = (newFilters: any) => {
-        setFilters(newFilters);
-        loadDeletedCases(newFilters);
-    };
-
     const handleRestoreClick = (caseNumber: string) => {
         setCaseToRestore(caseNumber);
         setShowConfirmDialog(true);
@@ -131,27 +126,15 @@ const Deleted = () => {
         }
     };
 
-    const handleResetFilters = () => {
-        setFilters({
-            caseNumber: "",
-            dependency: "",
-            technicianName: ""
-        });
-        loadDeletedCases();
-    };
-
     const paginatedCases = getPaginatedCases();
 
     return (
         <div className="flex min-h-screen bg-gray-50 relative">
-            {/* Sidebar lateral - oculto en móvil por defecto */}
             <div className="md:block md:w-64 flex-shrink-0">
                 <Sidebar />
             </div>
 
-            {/* Contenido principal - con margen izquierdo cuando el sidebar está visible */}
             <main className="flex-1">
-                {/* Espacio para el header en móvil */}
                 <div className="h-16 md:h-0"></div>
 
                 <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
@@ -176,7 +159,6 @@ const Deleted = () => {
                         isProcessing={isRestoring}
                     />
 
-                    {/* Filtros minimalistas en una sola fila */}
                     <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 mb-4">
                         <div className="flex flex-col sm:flex-row gap-3">
                             <div className="flex-1">
@@ -195,7 +177,7 @@ const Deleted = () => {
 
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => loadDeletedCases(true)} // true indica búsqueda específica
+                                    onClick={() => loadDeletedCases(true)}
                                     disabled={loading}
                                     className="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed min-w-[100px]"
                                 >

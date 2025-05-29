@@ -39,23 +39,19 @@ const Login = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === " ") {
-      e.preventDefault(); // Bloquea la tecla de espacio
+      e.preventDefault();
     }
   };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-100">
-      {/* Sección de imagen (oculta en móviles) */}
       <div className="hidden lg:block lg:w-2/3 xl:w-2/3 h-screen">
         <div
           className="h-full w-full bg-cover bg-center"
           style={{ backgroundImage: `url(${backgroundImage})` }}
         />
       </div>
-
-      {/* Sección del formulario */}
       <div className="w-full lg:w-1/2 xl:w-1/3 flex items-center justify-center p-6 sm:p-8 md:p-12 h-screen relative">
-        {/* Contenedor de error fijo en la parte superior */}
         <div className="absolute top-20 left-0 right-0 flex justify-center">
           <div
             className={`w-full max-w-md mx-4 transition-all duration-300 ease-in-out transform ${error ? "translate-y-0 opacity-100" : "-translate-y-5 opacity-0"
@@ -103,13 +99,13 @@ const Login = () => {
         </div>
 
         <div className="w-full max-w-md space-y-8 mt-8">
-          {/* Encabezado */}
+
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Bienvenido</h1>
             <p className="mt-2 text-gray-500">Ingresa tus credenciales para continuar</p>
           </div>
 
-          {/* Formulario */}
+
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
               <div>
@@ -203,5 +199,4 @@ const Login = () => {
     </div>
   );
 };
-
 export default Login;

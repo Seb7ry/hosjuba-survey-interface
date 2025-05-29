@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { FaChevronLeft, FaChevronRight, FaFileAlt, FaStar, FaEye } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaStar, FaEye } from "react-icons/fa";
 import type { Case } from '../../../pages/CaseU';
 import CaseUCard from './CaseUCard';
 import { formatDateTime } from "../../Utils";

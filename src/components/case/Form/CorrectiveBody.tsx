@@ -179,14 +179,11 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const handleMaterialChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         const updatedMaterials = [...formData.serviceData.materials];
-
-        // Actualizar el valor del campo modificado
         updatedMaterials[index] = {
             ...updatedMaterials[index],
             [name]: name === "quantity" ? parseInt(value) || 0 : value
         };
 
-        // Filtrar materiales que no tengan valores válidos
         const filteredMaterials = updatedMaterials.map(material => {
             if (material.quantity === 0 && (!material.description || material.description.trim() === "")) {
                 return { quantity: undefined, description: undefined };
@@ -235,7 +232,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
     return (
         <div className="space-y-6">
-            {/* Mostrar mensaje de error si existe */}
             {errorMessage && (
                 <ErrorMessage
                     message={errorMessage}
@@ -243,7 +239,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 />
             )}
 
-            {/* Sección de Equipos */}
             <div>
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-lg font-medium text-gray-700">
@@ -281,7 +276,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-2">
-                                {/* Campo de búsqueda de equipo */}
                                 <div className="relative">
                                     <label className="block text-xs font-medium text-gray-500">Nombre*</label>
                                     <div className="relative">
@@ -334,7 +328,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                     )}
                                 </div>
 
-                                {/* Campos deshabilitados que se llenan automáticamente */}
                                 <div className="space-y-1">
                                     <label className="block text-xs font-medium text-gray-500">Marca</label>
                                     <div className="w-full px-2 py-1 text-sm border border-gray-200 rounded bg-gray-50 text-gray-500">
@@ -397,7 +390,6 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 </div>
             </div>
 
-            {/* Sección de Materiales */}
             <div>
                 <div className="flex justify-between items-center mb-3">
                     <h2 className="text-lg font-medium text-gray-700">

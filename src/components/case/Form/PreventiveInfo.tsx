@@ -84,7 +84,6 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
-                {/* Campo de búsqueda de equipo */}
                 <div className="relative md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Equipo*</label>
                     <div className="relative">
@@ -128,7 +127,6 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                     )}
                 </div>
 
-                {/* Campos deshabilitados que se llenan automáticamente */}
                 <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Marca</label>
                     <div className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-500">
@@ -157,7 +155,6 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                     </div>
                 </div>
 
-                {/* Nuevo campo para ubicación */}
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación del Equipo</label>
                     <input

@@ -13,8 +13,6 @@ import {
   UserCheck,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { FaHouseCircleCheck, FaUserCheck } from "react-icons/fa6";
-import { FaUserAltSlash } from "react-icons/fa";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -57,7 +55,6 @@ const Sidebar = () => {
           >
             <Menu size={24} className="text-gray-700" />
           </button>
-          {/* Botón de volver en móvil */}
           <button
             onClick={handleGoBack}
             className="p-2 bg-white text-gray-800 rounded-md shadow-md hover:bg-gray-100 transition-colors duration-200"
@@ -95,7 +92,6 @@ const Sidebar = () => {
             </button>
           </div>
 
-          {/* Botón de volver en desktop (dentro del sidebar) */}
           <div className="px-3 pt-2 md:block hidden">
             <button
               onClick={handleGoBack}

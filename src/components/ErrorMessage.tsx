@@ -1,4 +1,3 @@
-// components/ErrorMessage.tsx
 import { X } from 'lucide-react';
 
 type ErrorMessageProps = {
