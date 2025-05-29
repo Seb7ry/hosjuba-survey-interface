@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshSession } from './session.service';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -23,6 +24,7 @@ export const generatePreventivePdf = async (caseNumber: string): Promise<Blob> =
             responseType: 'blob',
         }
     );
+    await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
 };
 
@@ -35,5 +37,6 @@ export const generateCorrectivePdf = async (caseNumber: string): Promise<Blob> =
             responseType: 'blob',
         }
     );
+    await refreshSession(sessionStorage.getItem('username') || '');
     return response.data; 
 };

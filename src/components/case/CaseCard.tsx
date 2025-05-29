@@ -12,6 +12,7 @@ type CaseCardsProps = {
     error?: string;
     onErrorClose?: () => void;
     typeCase: "Mantenimiento" | "Preventivo";
+    onViewPdf: (caseNumber: string) => void;
 };
 
 const CaseCards = ({
@@ -21,6 +22,7 @@ const CaseCards = ({
     error,
     onErrorClose,
     typeCase,
+    onViewPdf,
 }: CaseCardsProps) => {
 
     const navigate = useNavigate();
@@ -80,7 +82,11 @@ const CaseCards = ({
                         </div>
 
                         <div className="mt-3 flex justify-end space-x-4">
-                            <button className="text-yellow-600 hover:text-yellow-900 transition-colors" title="Ver">
+                            <button
+                                className="text-yellow-600 hover:text-yellow-900 transition-colors"
+                                title="Ver"
+                                onClick={() => onViewPdf(item.numero)}
+                            >
                                 <FaEye className="w-4 h-4" />
                             </button>
                             <button

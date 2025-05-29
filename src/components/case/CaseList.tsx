@@ -314,6 +314,10 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     error={error || undefined}
                     onErrorClose={() => setShowError(false)}
                     typeCase={typeCase}
+                    onViewPdf={(caseNumber) => {
+                        setSelectedCaseNumber(caseNumber);
+                        setShowPdfModal(true);
+                    }}
                 />
             )}
 

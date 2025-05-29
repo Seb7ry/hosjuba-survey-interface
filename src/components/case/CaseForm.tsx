@@ -50,7 +50,12 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
     const name = target.name;
     const value = target.value;
     const type = 'type' in target ? target.type : 'text';
-    const checked = type === 'checkbox' && 'checked' in target ? target.checked : undefined;
+
+    // 👇 Safe checkbox check
+    const finalValue =
+      type === 'checkbox' && 'checked' in target
+        ? (target as HTMLInputElement).checked
+        : value;
 
     if (name.includes('.')) {
       const keys = name.split('.');
@@ -58,15 +63,23 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
         const newState = { ...prev };
         let current = newState;
         for (let i = 0; i < keys.length - 1; i++) {
-          current = current[keys[i]] = { ...current[keys[i]] };
+          const key = keys[i];
+          if (!current[key] || typeof current[key] !== 'object') {
+            current[key] = {};
+          } else {
+            current[key] = { ...current[key] };
+          }
+          current = current[key];
         }
-        current[keys[keys.length - 1]] = type === 'checkbox' ? checked : value;
+
+        current[keys[keys.length - 1]] = finalValue;
+        console.log("🔧 Nuevo estado:", newState);
         return newState;
       });
     } else {
       setFormData((prev: any) => ({
         ...prev,
-        [name]: type === 'checkbox' ? checked : value,
+        [name]: finalValue,
       }));
     }
   };

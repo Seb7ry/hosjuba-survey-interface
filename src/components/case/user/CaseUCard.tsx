@@ -46,7 +46,7 @@ const CaseUCard = ({ item, onRateClick, onViewDocument, isRatingDisabled }: Case
         </div>
       </div>
 
-      {item.rated ? (
+      {item.rated || item.estado === 'Cerrado' ? (
         <button
           onClick={() => onViewDocument(item.numero, item.tipoServicio)}
           className="w-full mt-2 py-2 px-4 border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-sm font-medium flex items-center justify-center space-x-2 transition-colors"

@@ -203,7 +203,20 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                     <select
                         name="serviceData.level"
                         value={formData.serviceData.level}
-                        onChange={handleChange}
+                        onChange={(e) => {
+                            const newLevel = e.target.value;
+                            setFormData({
+                                ...formData,
+                                serviceData: {
+                                    ...formData.serviceData,
+                                    level: newLevel,
+                                    escalationTechnician: {
+                                        ...formData.serviceData.escalationTechnician,
+                                        ...(formData.serviceData.escalationTechnician.level === newLevel && { level: "" })
+                                    }
+                                }
+                            });
+                        }}
                         required
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
@@ -287,12 +300,17 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                                 >
                                     <option value="">Seleccione el nivel...</option>
-                                    {serviceLevels.map((level) => (
-                                        <option key={level} value={level}>
-                                            {level}
-                                        </option>
-                                    ))}
+                                    {serviceLevels
+                                        .filter(level => level !== formData.serviceData.level) // Filtrar el nivel actual
+                                        .map((level) => (
+                                            <option key={level} value={level}>
+                                                {level}
+                                            </option>
+                                        ))}
                                 </select>
+                                {formData.serviceData.escalationTechnician.level === formData.serviceData.level && (
+                                    <p className="mt-1 text-sm text-red-600">No puedes escalar al mismo nivel del servicio.</p>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

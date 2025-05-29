@@ -154,7 +154,7 @@ const CaseUList = ({
                     </td>
                     <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
                     <td className="px-6 py-4">
-                      {item.rated ? (
+                      {item.rated || item.estado === 'Cerrado' ? (
                         <button
                           onClick={() => handleViewDocument(item.numero, item.tipoServicio)}
                           className="py-1.5 px-3 border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"

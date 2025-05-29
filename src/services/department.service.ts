@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { refreshSession } from './session.service';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -21,6 +22,7 @@ export type DepartmentData = {
 export const getAllDepartments = async (): Promise<DepartmentData[]> => {
   try {
     const response = await axios.get(`${API_URL}/department`, headers());
+    await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
   } catch (error: any) {
     throw new Error(error.response?.data?.message || 'Error al obtener dependencias.');
@@ -34,6 +36,7 @@ export const createDepartment = async (name: string): Promise<DepartmentData> =>
       { name },
       headers()
     );
+    await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
   } catch (error: any) {
     console.error('Error creating department:', error.response?.data);
@@ -48,6 +51,7 @@ export const updateDepartment = async (currentName: string, newName: string): Pr
       { currentName, newName },
       headers()
     );
+    await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
   } catch (error: any) {
     console.error('Error updating department:', error.response?.data);
@@ -59,11 +63,12 @@ export const deleteDepartment = async (name: string): Promise<void> => {
   try {
     await axios.delete(
       `${API_URL}/department`,
-      { 
+      {
         ...headers(),
-        data: { name } 
+        data: { name }
       }
     );
+    await refreshSession(sessionStorage.getItem('username') || '');
   } catch (error: any) {
     console.error('Error deleting department:', error.response?.data);
     throw new Error(error.response?.data?.message || 'Error al eliminar la dependencia.');

@@ -10,8 +10,11 @@ import {
   BarChart2,
   ChevronLeft,
   Monitor,
+  UserCheck,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { FaHouseCircleCheck, FaUserCheck } from "react-icons/fa6";
+import { FaUserAltSlash } from "react-icons/fa";
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ const Sidebar = () => {
     { label: "Usuarios", icon: <User size={20} />, path: "/user" },
     { label: "Equipos", icon: <Monitor size={20} />, path: "/equipment" },
     { label: "Casos", icon: <ClipboardList size={20} />, path: "/case" },
-    { label: "MisCasos", icon: <ClipboardList size={20} />, path: "/user/case" },
+    { label: "MisCasos", icon: <UserCheck size={20} />, path: "/user/case" },
     { label: "Reportes", icon: <BarChart2 size={20} />, path: "/report" },
   ];
 
