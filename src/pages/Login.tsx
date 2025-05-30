@@ -12,6 +12,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showInfoModal, setShowInfoModal] = useState(false);
 
   useEffect(() => {
     if (error) {
@@ -99,12 +100,12 @@ const Login = () => {
         </div>
 
         <div className="w-full max-w-md space-y-8 mt-8">
-
           <div className="text-center">
             <h1 className="text-3xl font-bold text-gray-900">Bienvenido</h1>
-            <p className="mt-2 text-gray-500">Ingresa tus credenciales para continuar</p>
+            <p className="mt-2 text-gray-500">
+              Ingresa tus credenciales para continuar
+            </p>
           </div>
-
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <div className="space-y-4">
@@ -118,6 +119,7 @@ const Login = () => {
                 <input
                   type="text"
                   id="username"
+                  placeholder="Ingrese su usuario"
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   value={username.toUpperCase()}
                   onChange={(e) => setUsername(e.target.value.toUpperCase())}
@@ -138,6 +140,7 @@ const Login = () => {
                   <input
                     type={showPassword ? "text" : "password"}
                     id="password"
+                    placeholder="Ingrese su contrseña"
                     className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 pr-10"
                     value={password.toUpperCase()}
                     onChange={(e) => setPassword(e.target.value.toUpperCase())}
@@ -149,7 +152,9 @@ const Login = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-gray-700"
-                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                    aria-label={
+                      showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                    }
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -194,9 +199,71 @@ const Login = () => {
               </button>
             </div>
           </form>
+
+          <div className="text-center text-sm text-gray-500">
+            ¿Deseas más información de este servicio?{" "}
+            <button
+              onClick={() => setShowInfoModal(true)}
+              className="text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Aquí
+            </button>
+          </div>
         </div>
+
+        {showInfoModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 overflow-y-auto max-h-[90vh] flex flex-col">
+              <div className="relative mb-4 text-center">
+                <h2 className="text-xl font-bold text-gray-900 inline-block">
+                  Información del Servicio
+                </h2>
+                <button
+                  onClick={() => setShowInfoModal(false)}
+                  className="absolute right-0 top-0 text-gray-500 hover:text-gray-700"
+                >
+                  <svg
+                    className="h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              <div className="flex-grow overflow-y-auto">
+                <div className="text-gray-700 text-center">
+                  <p className="mb-4">
+                    Este software de gestión documental técnica correctiva y preventiva del área de sistemas fue desarrollado en el Hospital San Juan Bautista como parte del proyecto de paz y desarrollo regional.
+                  </p>
+                  <p className="mb-4">
+                    El desarrollo estuvo a cargo de un estudiante de la Universidad de Ibagué, en el marco del programa Paz y Región durante su semestre de inmersión, contando con el respaldo, acompañamiento y facilidades brindadas por el área de sistemas del hospital.
+                    Esta colaboración tuvo como propósito contribuir a la transformación digital del sistema de salud y al fortalecimiento institucional en el municipio de Chaparral, Tolima.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 flex justify-center">
+                <button
+                  onClick={() => setShowInfoModal(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
+
 export default Login;

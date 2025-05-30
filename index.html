@@ -2,12 +2,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link id="favicon" rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sistema de Soporte TI Hosjuba</title>
+    <script>
+      // Función para cambiar el favicon según el tema
+      function updateFavicon() {
+        const favicon = document.getElementById('favicon');
+        const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        favicon.href = isDarkMode ? '/icons/logo-hosjuba.png' : '/icons/logo.png';
+      }
+
+      // Ejecutar al cargar y cuando cambie el tema
+      document.addEventListener('DOMContentLoaded', updateFavicon);
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', updateFavicon);
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+  </script>
   </body>
 </html>
