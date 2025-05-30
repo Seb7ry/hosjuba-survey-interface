@@ -36,6 +36,41 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
     loadDepartments();
   }, []);
 
+  // Función para verificar si los campos requeridos están completos (solo para correctivos)
+  const areRequiredFieldsComplete = () => {
+    const { serviceData } = formData;
+    return (
+      serviceData.attendedAt &&
+      serviceData.solvedAt &&
+      serviceData.diagnosis &&
+      serviceData.solution
+    );
+  };
+
+  // Efecto para desmarcar automáticamente si los campos requeridos se borran
+  useEffect(() => {
+    if (!isPreventive && formData.toRating && !areRequiredFieldsComplete()) {
+      setFormData((prev: any) => ({ ...prev, toRating: false }));
+    }
+  }, [formData.serviceData.attendedAt, formData.serviceData.solvedAt,
+  formData.serviceData.diagnosis, formData.serviceData.solution]);
+
+  // Función para formatear la fecha al formato que espera datetime-local
+  const formatDateTimeForInput = (dateTime: string | Date) => {
+    if (!dateTime) return '';
+
+    const date = new Date(dateTime);
+    if (isNaN(date.getTime())) return '';
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setFormData({ ...formData, dependency: value });
@@ -55,6 +90,14 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
   const selectDepartment = (department: string) => {
     setFormData({ ...formData, dependency: department });
     setShowDropdown(false);
+  };
+
+  const handleDateTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev: any) => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   return (
@@ -143,7 +186,18 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
               Cerrado
             </option>
           </select>
+        </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Fecha del Reporte*</label>
+          <input
+            type="datetime-local"
+            name="reportedAt"
+            value={formatDateTimeForInput(formData.reportedAt)}
+            onChange={handleDateTimeChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            required
+          />
         </div>
 
         {/* Textareas en una sola fila para pantallas grandes */}
@@ -159,18 +213,8 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
               className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Observaciones</label>
-            <textarea
-              name="observations"
-              value={formData.observations}
-              onChange={handleChange}
-              rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            />
-          </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 relative">
             <input
               id="toRating"
               name="toRating"
@@ -181,15 +225,26 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
                 if (!checked) {
                   setFormData((prev: any) => ({ ...prev, toRating: false }));
                 } else {
+                  // Solo para casos correctivos
+                  if (!isPreventive && !areRequiredFieldsComplete()) {
+                    alert('Por favor complete todos los campos requeridos (Fecha de atención, Fecha de solución, Diagnóstico y Solución) antes de habilitar la calificación.');
+                    return;
+                  }
                   setPendingToRatingChange(true);
                   setShowConfirmDialog(true);
                 }
               }}
               className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              disabled={!isPreventive && !areRequiredFieldsComplete() && !formData.toRating}
             />
             <label htmlFor="toRating" className="text-sm font-medium text-gray-700">
               ¿Habilitar para calificación?
             </label>
+            {!isPreventive && !areRequiredFieldsComplete() && !formData.toRating && (
+              <div className="absolute left-0 -bottom-6 text-xs text-gray-500">
+                Complete todos los campos requeridos para habilitar
+              </div>
+            )}
           </div>
           <ConfirmDialog
             isOpen={showConfirmDialog}
@@ -199,6 +254,12 @@ const BasicInfo = ({ formData, handleChange, setFormData, isPreventive }: BasicI
               setPendingToRatingChange(false);
             }}
             onConfirm={async () => {
+              if (!isPreventive && !areRequiredFieldsComplete()) {
+                alert('No se puede habilitar la calificación. Faltan campos requeridos.');
+                setShowConfirmDialog(false);
+                setPendingToRatingChange(false);
+                return;
+              }
               setFormData((prev: any) => ({ ...prev, toRating: true }));
               setShowConfirmDialog(false);
               setPendingToRatingChange(false);

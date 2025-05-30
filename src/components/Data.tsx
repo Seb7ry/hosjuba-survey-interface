@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-
 export const useFormCorrective = () => {
     const [formData, setFormData] = useState({
         caseNumber: "202X",
@@ -10,7 +9,7 @@ export const useFormCorrective = () => {
         serviceType: "",
         dependency: "",
         status: "Abierto",
-        reportedAt: new Date().toISOString(),
+        reportedAt: "",
         observations: "",
         reportedBy: {
             _id: "",
@@ -54,7 +53,8 @@ export const useFormCorrective = () => {
                 brand: "",
                 model: "",
                 serial: "",
-                inventoryNumber: ""
+                inventoryNumber: "",
+                convention:"",
             }],
             materials: [{
                 quantity: 0,
@@ -75,7 +75,7 @@ export const useFormPreventive = () => {
         serviceType: "Mantenimiento Preventivo",
         dependency: "",
         status: "Abierto",
-        reportedAt: new Date().toISOString(),
+        reportedAt: "",
         observations: "",
         reportedBy: {
             _id: "",

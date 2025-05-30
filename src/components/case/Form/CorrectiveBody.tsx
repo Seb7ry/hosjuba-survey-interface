@@ -36,6 +36,16 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     const [showDropdowns, setShowDropdowns] = useState<boolean[]>([]);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+    // Verificación inicial para asegurar que formData tenga la estructura correcta
+    const safeFormData = {
+        ...formData,
+        serviceData: {
+            ...formData.serviceData,
+            equipments: formData.serviceData?.equipments || [],
+            materials: formData.serviceData?.materials || []
+        }
+    };
+
     useEffect(() => {
         const loadEquipments = async () => {
             setIsLoading(true);
@@ -43,7 +53,10 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 const data = await getAllEquipment();
                 setEquipments(data);
                 setFilteredEquipments(data);
-                setShowDropdowns(new Array(formData.serviceData.equipments.length).fill(false));
+
+                // Usar safeFormData en lugar de formData directamente
+                const equipmentsLength = safeFormData.serviceData.equipments.length;
+                setShowDropdowns(new Array(equipmentsLength).fill(false));
             } catch (err) {
                 setError('Error al cargar los equipos');
                 console.error(err);
@@ -53,11 +66,11 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         };
 
         loadEquipments();
-    }, [formData.serviceData.equipments.length]);
+    }, [safeFormData.serviceData.equipments.length]);
 
     const handleEquipmentSearch = (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        const updatedEquipments = [...formData.serviceData.equipments];
+        const updatedEquipments = [...safeFormData.serviceData.equipments];
         updatedEquipments[index] = {
             ...updatedEquipments[index],
             name: value,
@@ -94,7 +107,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     };
 
     const selectEquipment = (index: number, equipment: EquipmentResponse) => {
-        const updatedEquipments = [...formData.serviceData.equipments];
+        const updatedEquipments = [...safeFormData.serviceData.equipments];
         updatedEquipments[index] = {
             ...updatedEquipments[index],
             name: equipment.name,
@@ -120,7 +133,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
     const handleConventionChange = (index: number, e: ChangeEvent<HTMLSelectElement>) => {
         const { value } = e.target;
-        const updatedEquipments = [...formData.serviceData.equipments];
+        const updatedEquipments = [...safeFormData.serviceData.equipments];
         updatedEquipments[index] = {
             ...updatedEquipments[index],
             convention: value
@@ -135,7 +148,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     };
 
     const addEquipment = () => {
-        if (formData.serviceData.equipments.length >= 5) {
+        if (safeFormData.serviceData.equipments.length >= 5) {
             setErrorMessage("No se pueden agregar más de 5 equipos");
             return;
         }
@@ -153,7 +166,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         handleChange({
             target: {
                 name: "serviceData.equipments",
-                value: [newEquipment, ...formData.serviceData.equipments]
+                value: [newEquipment, ...safeFormData.serviceData.equipments]
             }
         });
 
@@ -161,7 +174,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     };
 
     const removeEquipment = (index: number) => {
-        const updatedEquipments = formData.serviceData.equipments
+        const updatedEquipments = safeFormData.serviceData.equipments
             .filter((_: any, i: number) => i !== index);
 
         handleChange({
@@ -178,7 +191,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
     const handleMaterialChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        const updatedMaterials = [...formData.serviceData.materials];
+        const updatedMaterials = [...safeFormData.serviceData.materials];
         updatedMaterials[index] = {
             ...updatedMaterials[index],
             [name]: name === "quantity" ? parseInt(value) || 0 : value
@@ -200,7 +213,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
     };
 
     const addMaterial = () => {
-        if (formData.serviceData.materials.length >= 10) {
+        if (safeFormData.serviceData.materials.length >= 10) {
             setErrorMessage("No se pueden agregar más de 10 materiales");
             return;
         }
@@ -213,13 +226,13 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
         handleChange({
             target: {
                 name: "serviceData.materials",
-                value: [newMaterial, ...formData.serviceData.materials]
+                value: [newMaterial, ...safeFormData.serviceData.materials]
             }
         });
     };
 
     const removeMaterial = (index: number) => {
-        const updatedMaterials = formData.serviceData.materials
+        const updatedMaterials = safeFormData.serviceData.materials
             .filter((_: any, i: number) => i !== index);
 
         handleChange({
@@ -244,16 +257,16 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                     <h2 className="text-lg font-medium text-gray-700">
                         Equipos Intervenidos
                         <span className="text-sm text-gray-500 ml-2">
-                            ({formData.serviceData.equipments.length}/5)
+                            ({safeFormData.serviceData.equipments.length}/5)
                         </span>
                     </h2>
                     <button
                         type="button"
                         onClick={addEquipment}
-                        disabled={formData.serviceData.equipments.length >= 5}
-                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${formData.serviceData.equipments.length >= 5
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+                        disabled={safeFormData.serviceData.equipments.length >= 5}
+                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${safeFormData.serviceData.equipments.length >= 5
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
                             }`}
                     >
                         + Agregar Equipo
@@ -261,10 +274,10 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 </div>
 
                 <div className="space-y-3">
-                    {formData.serviceData.equipments.map((equipment: any, index: number) => (
+                    {safeFormData.serviceData.equipments.map((equipment: any, index: number) => (
                         <div key={index} className="p-3 border border-gray-200 rounded-lg">
                             <div className="flex justify-between items-center mb-2">
-                                {formData.serviceData.equipments.length > 1 && (
+                                {safeFormData.serviceData.equipments.length > 1 && (
                                     <button
                                         type="button"
                                         onClick={() => removeEquipment(index)}
@@ -395,16 +408,16 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                     <h2 className="text-lg font-medium text-gray-700">
                         Materiales Utilizados
                         <span className="text-sm text-gray-500 ml-2">
-                            ({formData.serviceData.materials.length}/10)
+                            ({safeFormData.serviceData.materials.length}/10)
                         </span>
                     </h2>
                     <button
                         type="button"
                         onClick={addMaterial}
-                        disabled={formData.serviceData.materials.length >= 10}
-                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${formData.serviceData.materials.length >= 10
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
+                        disabled={safeFormData.serviceData.materials.length >= 10}
+                        className={`px-3 py-1 rounded-md text-sm text-white focus:outline-none focus:ring-2 focus:ring-offset-2 ${safeFormData.serviceData.materials.length >= 10
+                                ? "bg-gray-400 cursor-not-allowed"
+                                : "bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500"
                             }`}
                     >
                         + Agregar Material
@@ -412,10 +425,10 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                 </div>
 
                 <div className="space-y-2">
-                    {formData.serviceData.materials.map((material: any, index: number) => (
+                    {safeFormData.serviceData.materials.map((material: any, index: number) => (
                         <div key={index} className="p-3 border border-gray-200 rounded-lg">
                             <div className="flex justify-between items-center mb-2">
-                                {formData.serviceData.materials.length > 1 && (
+                                {safeFormData.serviceData.materials.length > 1 && (
                                     <button
                                         type="button"
                                         onClick={() => removeMaterial(index)}
@@ -428,12 +441,11 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
 
                             <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
                                 <div className="space-y-1">
-                                    <label className="block text-xs font-medium text-gray-500">Cantidad*</label>
+                                    <label className="block text-xs font-medium text-gray-500">Cantidad</label>
                                     <input
                                         type="number"
                                         name="quantity"
-                                        min="0"
-                                        placeholder="0"
+                                        placeholder="Cantidad de materiales"
                                         value={material.quantity || ''}
                                         onChange={(e) => handleMaterialChange(index, e)}
                                         className="w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -441,7 +453,7 @@ const CorrectiveBody = ({ formData, handleChange }: CorrectiveBodyProps) => {
                                 </div>
 
                                 <div className="sm:col-span-3 space-y-1">
-                                    <label className="block text-xs font-medium text-gray-500">Descripción*</label>
+                                    <label className="block text-xs font-medium text-gray-500">Descripción</label>
                                     <input
                                         type="text"
                                         name="description"

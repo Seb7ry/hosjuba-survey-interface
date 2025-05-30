@@ -8,7 +8,7 @@ const Case = () => {
     const formCards = [
         {
             id: 1,
-            title: "Formulario de Casos Preventivos",
+            title: "Formulario de Mantenimiento Preventivo",
             description: "Registra información detallada sobre casos de atención preventiva, seguimiento y control de riesgos.",
             icon: <FaWpforms />,
             path: "preventive",
@@ -18,7 +18,7 @@ const Case = () => {
         },
         {
             id: 2,
-            title: "Formulario de Mantenimiento de Equipos",
+            title: "Formulario de Mantenimiento Correctivo",
             description: "Documenta las actividades realizadas durante el mantenimiento preventivo o correctivo de equipos médicos y tecnológicos.",
             icon: <FaFileAlt />,
             path: "corrective",

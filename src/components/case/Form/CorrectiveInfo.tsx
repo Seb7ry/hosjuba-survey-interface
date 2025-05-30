@@ -306,7 +306,7 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="relative">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">ID Técnico</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">ID Técnico*</label>
                                     <div className="relative">
                                         <input
                                             type="text"
@@ -351,7 +351,7 @@ const CorrectiveInfo = ({ formData, handleChange, setFormData }: CorrectiveBodyP
                                 </div>
 
                                 <div className="relative">
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Nombre*</label>
                                     <div className="relative">
                                         <input
                                             type="text"

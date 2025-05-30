@@ -19,19 +19,19 @@ export const createCase = async (caseData: any) => {
     const response = await axios.post(`${API_URL}/case`, caseData, headers());
     await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
-}
+};
 
 export const getCaseByNumber = async (caseNumber: any) => {
     const response = await axios.get(`${API_URL}/case/${caseNumber}`, headers());
     await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
-}
+};
 
 export const searchCases = async (filters: any) => {
     try {
         const cleanFilters = Object.fromEntries(
-            Object.entries(filters).filter(([_, v]) => v !== undefined && v !== '' && v !== null
-            ))
+            Object.entries(filters).filter(([_, v]) => v !== undefined && v !== '' && v !== null)
+        );
 
         const response = await axios.get(`${API_URL}/case`, {
             ...headers(),
@@ -69,9 +69,8 @@ export const getDeletedCases = async (caseNumber?: string) => {
     return response.data;
 };
 
-
 export const restoreCase = async (caseNumber: string) => {
-    const response = await axios.get(`${API_URL}/case/restore/${caseNumber}`, headers());
+    const response = await axios.post(`${API_URL}/case/restore/${caseNumber}`, {}, headers());
     await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
 };

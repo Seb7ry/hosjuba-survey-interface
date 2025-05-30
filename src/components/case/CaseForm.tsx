@@ -65,7 +65,6 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
     const value = target.value;
     const type = 'type' in target ? target.type : 'text';
 
-    // 👇 Safe checkbox check
     const finalValue =
       type === 'checkbox' && 'checked' in target
         ? (target as HTMLInputElement).checked
@@ -112,16 +111,20 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
     setIsSubmitting(true);
 
     try {
+      const caseDataWithType = {
+        ...formData,
+        caseType: isPreventive ? 'preventive' : 'corrective'
+      };
+
       let updatedOrCreatedCase;
       let shouldCreateEscalation = false;
 
       if (isEditMode && numberCase) {
-
         const originalCase = await getCaseByNumber(numberCase);
-        updatedOrCreatedCase = await updateCase(numberCase, formData);
+        updatedOrCreatedCase = await updateCase(numberCase, caseDataWithType);
 
         if (!isPreventive) {
-          const currentServiceData = formData.serviceData as any;
+          const currentServiceData = caseDataWithType.serviceData as any;
           const originalServiceData = originalCase.serviceData as any;
 
           shouldCreateEscalation =
@@ -131,10 +134,10 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
               originalServiceData.escalationTechnician?._id !== currentServiceData.escalationTechnician._id);
         }
       } else {
-        updatedOrCreatedCase = await createCase(formData);
+        updatedOrCreatedCase = await createCase(caseDataWithType);
 
         if (!isPreventive) {
-          const currentServiceData = formData.serviceData as any;
+          const currentServiceData = caseDataWithType.serviceData as any;
           shouldCreateEscalation =
             currentServiceData.requiresEscalation &&
             currentServiceData.escalationTechnician?._id;
@@ -142,10 +145,10 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
       }
 
       if (shouldCreateEscalation) {
-        const currentServiceData = formData.serviceData as any;
+        const currentServiceData = caseDataWithType.serviceData as any;
 
         const updatedOriginalCase = {
-          ...formData,
+          ...caseDataWithType,
           status: "Cerrado",
           serviceData: {
             ...currentServiceData,
@@ -161,7 +164,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
           await updateCase(updatedOrCreatedCase.caseNumber, newCase);
         }
 
-        const escalationCaseData = JSON.parse(JSON.stringify(formData));
+        const escalationCaseData = JSON.parse(JSON.stringify(caseDataWithType));
         delete escalationCaseData._id;
 
         const escalationCase = {
@@ -242,9 +245,11 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
               setFormData={setFormData}
               isPreventive={isPreventive}
               validateForm={validateForm}
-              setValidateForm={setValidateForm} onSave={function (): void {
+              setValidateForm={setValidateForm}
+              onSave={function (): void {
                 throw new Error("Function not implemented.");
-              } }            />
+              }}
+            />
             <BodyForm
               formData={formData}
               handleChange={handleChange}

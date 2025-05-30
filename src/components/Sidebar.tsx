@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   Monitor,
   UserCheck,
+  HistoryIcon,
 } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
@@ -42,6 +43,7 @@ const Sidebar = () => {
     { label: "Casos", icon: <ClipboardList size={20} />, path: "/case" },
     { label: "MisCasos", icon: <UserCheck size={20} />, path: "/user/case" },
     { label: "Reportes", icon: <BarChart2 size={20} />, path: "/report" },
+    { label: "Historial", icon: <HistoryIcon size={20} />, path: "/history" },
   ];
 
   return (

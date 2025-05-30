@@ -131,7 +131,7 @@ const ReporterInfo = ({ formData, setFormData }: ReporterInfoProps) => {
         </div>
 
         <div className="relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Nombre*</label>
           <div className="relative">
             <input
               type="text"

@@ -156,7 +156,7 @@ const PreventiveInfo = ({ formData, handleChange, setFormData }: PreventiveInfoP
                 </div>
 
                 <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación del Equipo</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ubicación del Equipo*</label>
                     <input
                         type="text"
                         name="serviceData.location"
