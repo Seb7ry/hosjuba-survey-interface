@@ -21,7 +21,6 @@ const HeadForm = ({
   handleChange,
   setFormData,
   isPreventive,
-  onSave,
   validateForm: externalValidateForm,
   setValidateForm: externalSetValidateForm
 }: HeadFormProps) => {
@@ -30,18 +29,6 @@ const HeadForm = ({
 
   const validateForm = externalValidateForm ?? internalValidateForm;
   const setValidateForm = externalSetValidateForm ?? setInternalValidateForm;
-
-  const handleSubmit = () => {
-    setValidateForm(true);
-
-    if (!formData.assignedTechnician?.signature) {
-      setFormError("Debe registrar la firma del técnico antes de guardar");
-      return;
-    }
-
-    setFormError(null);
-    onSave();
-  };
 
   return (
     <>
