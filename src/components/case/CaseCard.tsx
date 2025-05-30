@@ -48,7 +48,15 @@ const CaseCards = ({
 
             {cases.length > 0 ? (
                 cases.map((item) => (
-                    <div key={item.id} className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                    <div
+                        key={item.id}
+                        className={`bg-white p-4 rounded-lg shadow-sm border border-gray-100 ${item.toRating
+                                ? item.rated
+                                    ? ''
+                                    : 'bg-yellow-100'
+                                : ''
+                            }`}
+                    >
                         <div className="flex justify-between items-start">
                             <div>
                                 <h3 className="font-medium text-gray-900">{item.numero}</h3>

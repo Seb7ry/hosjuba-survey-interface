@@ -20,6 +20,8 @@ export type Case = {
     prioridad?: string;
     equipo: string;
     tecnico: string;
+    toRating?: boolean;
+    rated?: boolean;
 };
 
 interface CaseListProps {
@@ -103,6 +105,8 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                 funcionario: item.reportedBy?.name || "Sin especificar",
                 prioridad: item.serviceData?.priority,
                 tecnico: item.assignedTechnician.name,
+                toRating: item.toRating,
+                rated: item.rated
             }));
 
             setCases(mappedCases);
@@ -213,16 +217,16 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
             {windowWidth >= 1293 ? (
                 <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                    <table className="w-full text-left">
+                    <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 text-gray-600 text-sm">
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
-                                {hasPriority && <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
+                                {hasPriority && <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Prioridad</th>}
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
@@ -230,13 +234,18 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                 paginatedCases.map((item: Case) => (
                                     <tr
                                         key={item.id}
-                                        className="hover:bg-gray-50 transition-colors text-sm text-gray-700"
+                                        className={`hover:bg-gray-50 transition-colors text-sm text-gray-700 ${item.toRating
+                                                ? item.rated
+                                                    ? ''
+                                                    : 'bg-yellow-100'
+                                                : ''
+                                            }`}
                                     >
-                                        <td className="px-6 py-4 font-medium">{item.numero}</td>
-                                        <td className="px-6 py-4">{item.tecnico}</td>
-                                        <td className="px-6 py-4">{item.dependencia}</td>
+                                        <td className="px-6 py-4 font-medium text-center">{item.numero}</td>
+                                        <td className="px-6 py-4 text-center">{item.tecnico}</td>
+                                        <td className="px-6 py-4 text-center">{item.dependencia}</td>
                                         {hasPriority && (
-                                            <td className="px-6 py-4">
+                                            <td className="px-6 py-4 text-center">
                                                 {item.prioridad && (
                                                     <span className={`inline-flex items-center ${getPriorityStyles(item.prioridad)}`}>
                                                         {item.prioridad}
@@ -244,12 +253,12 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                                 )}
                                             </td>
                                         )}
-                                        <td className="px-6 py-4">
+                                        <td className="px-6 py-4 text-center">
                                             <span className={`inline-flex items-center ${getStatusStyles(item.estado)}`}>
                                                 {item.estado}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
+                                        <td className="px-6 py-4 text-gray-500 text-center">{formatDateTime(item.fechaReporte)}</td>
 
                                         <td className="px-6 py-4">
                                             <div className="flex justify-center space-x-4">

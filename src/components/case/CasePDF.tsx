@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { generatePreventivePdf, generateCorrectivePdf } from "../../services/pdf.service";
 import { Dialog, Transition } from "@headlessui/react";
-import { FaTimes, FaDownload } from "react-icons/fa";
+import { FaTimes, FaDownload, FaExternalLinkAlt } from "react-icons/fa";
 import { useMediaQuery } from "react-responsive";
 
 interface CasePDFProps {
@@ -16,6 +16,7 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const isMobile = useMediaQuery({ query: "(max-width: 768px)" });
+    const [mobilePdfGenerated, setMobilePdfGenerated] = useState(false);
 
     useEffect(() => {
         if (!isOpen) {
@@ -23,6 +24,7 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                 URL.revokeObjectURL(pdfUrl);
                 setPdfUrl(null);
             }
+            setMobilePdfGenerated(false);
             return;
         }
 
@@ -36,10 +38,15 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                     : generateCorrectivePdf(caseNumber));
 
                 if (isMobile) {
-                    onClose();
+                    // Para móviles, generamos el PDF pero no lo mostramos en el modal
+                    const blob = new Blob([response], { type: "application/pdf" });
+                    const url = URL.createObjectURL(blob);
+                    setPdfUrl(url);
+                    setMobilePdfGenerated(true);
                     return;
                 }
 
+                // Para desktop, mostramos el PDF en el modal
                 const blob = new Blob([response], { type: "application/pdf" });
                 const url = URL.createObjectURL(blob);
                 setPdfUrl(url);
@@ -71,10 +78,12 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
         document.body.removeChild(link);
     };
 
-    if (isMobile && isOpen) {
+    const handleOpenInNewTab = () => {
+        if (!pdfUrl) return;
+
+        window.open(pdfUrl, '_blank');
         onClose();
-        return null;
-    }
+    };
 
     return (
         <Transition appear show={isOpen} as="div">
@@ -88,7 +97,7 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                                 PDF del Caso {caseNumber}
                             </h3>
                             <div className="flex space-x-2">
-                                {pdfUrl && (
+                                {pdfUrl && !isMobile && (
                                     <button
                                         onClick={handleDownload}
                                         className="p-2 text-blue-600 hover:text-blue-800 rounded-full hover:bg-blue-50"
@@ -107,7 +116,7 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                             </div>
                         </div>
 
-                        <div className="flex-grow overflow-hidden">
+                        <div className="flex-grow overflow-hidden p-4">
                             {loading && (
                                 <div className="flex justify-center items-center h-full">
                                     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
@@ -130,7 +139,26 @@ const CasePDF = ({ isOpen, onClose, caseNumber, typeCase }: CasePDFProps) => {
                                 </div>
                             )}
 
-                            {pdfUrl && (
+                            {isMobile && mobilePdfGenerated && (
+                                <div className="h-full flex flex-col items-center justify-center text-center p-4">
+                                    <FaExternalLinkAlt className="w-12 h-12 text-blue-500 mb-4" />
+                                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                                        Estás en un dispositivo móvil
+                                    </h3>
+                                    <p className="text-gray-600 mb-6">
+                                        Para una mejor experiencia, el PDF se abrirá en una nueva pestaña.
+                                    </p>
+                                    <button
+                                        onClick={handleOpenInNewTab}
+                                        className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+                                    >
+                                        <span>Abrir PDF en nueva pestaña</span>
+                                        <FaExternalLinkAlt className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            )}
+
+                            {!isMobile && pdfUrl && (
                                 <iframe
                                     src={pdfUrl}
                                     className="w-full h-full border-none"

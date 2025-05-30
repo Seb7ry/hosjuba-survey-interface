@@ -6,7 +6,8 @@ import { formatDateTime } from "../../Utils";
 import CaseURating from './CaseURating';
 import { updateCase, getCaseByNumber } from '../../../services/case.service';
 import SuccessDialog from '../../SuccessDialog';
-import CasePDF from '../CasePDF'; 
+import CasePDF from '../CasePDF';
+import { getStatusStyles } from "../../Utils";
 
 interface CaseUListProps {
   cases: Case[];
@@ -118,19 +119,19 @@ const CaseUList = ({
   };
 
   return (
-    <>
+    <div className="space-y-4">
       {windowWidth >= 1293 ? (
         <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-left">
+          <table className="w-full">
             <thead>
               <tr className="bg-gray-50 text-gray-600 text-sm">
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Servicio</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Servicio</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -138,47 +139,43 @@ const CaseUList = ({
                 getPaginatedCases().map((item: Case) => (
                   <tr
                     key={item.id}
-                    className={`transition-colors text-sm ${item.rated ? 'bg-green-50 hover:bg-green-100' : 'hover:bg-gray-50'}`}
+                    className={`hover:bg-gray-50 transition-colors text-sm text-gray-700`}
                   >
-                    <td className="px-6 py-4 font-medium">{item.numero}</td>
-                    <td className="px-6 py-4 font-medium">{item.tipoServicio}</td>
-                    <td className="px-6 py-4">{item.tecnico}</td>
-                    <td className="px-6 py-4">{item.dependencia}</td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.estado === 'Completado' ? 'bg-green-100 text-green-800' :
-                        item.estado === 'En progreso' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
+                    <td className="px-6 py-4 font-medium text-center">{item.numero}</td>
+                    <td className="px-6 py-4 text-center">{item.tipoServicio}</td>
+                    <td className="px-6 py-4 text-center">{item.tecnico}</td>
+                    <td className="px-6 py-4 text-center">{item.dependencia}</td>
+                    <td className="px-6 py-4 text-center">
+                      <span className={`inline-flex items-center ${getStatusStyles(item.estado)}`}>
                         {item.estado}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-gray-500">{formatDateTime(item.fechaReporte)}</td>
+                    <td className="px-6 py-4 text-gray-500 text-center">{formatDateTime(item.fechaReporte)}</td>
                     <td className="px-6 py-4">
-                      {item.rated || item.estado === 'Cerrado' ? (
-                        <button
-                          onClick={() => handleViewDocument(item.numero, item.tipoServicio)}
-                          className="py-1.5 px-3 border border-green-200 bg-green-50 text-green-700 hover:bg-green-100 rounded-md text-sm font-medium flex items-center space-x-2 transition-colors"
-                          title="Ver documento del servicio"
-                        >
-                          <FaEye className="w-4 h-4" />
-                          <span>Documento</span>
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => handleRateClick(item.numero, item.tipoServicio)}
-                          disabled={!item.toRating}
-                          className={`py-1.5 px-3 border rounded-md text-sm font-medium flex items-center space-x-2 transition-colors ${!item.toRating ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed' :
-                            'border-yellow-200 bg-yellow-50 text-yellow-600 hover:bg-yellow-100 hover:border-yellow-300'
-                            }`}
-                          title={
-                            !item.toRating ? "Este caso no requiere calificación" :
-                              "Calificar servicio"
-                          }
-                        >
-                          <FaStar className="w-4 h-4" />
-                          <span>Calificar</span>
-                        </button>
-                      )}
+                      <div className="flex justify-center space-x-4">
+                        {item.rated || item.estado === 'Cerrado' ? (
+                          <button
+                            onClick={() => handleViewDocument(item.numero, item.tipoServicio)}
+                            className="flex items-center space-x-1 text-blue-600 hover:text-blue-900 transition-colors"
+                            title="Ver documento del servicio"
+                          >
+                            <FaEye className="w-4 h-4" />
+                            <span>Ver</span>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleRateClick(item.numero, item.tipoServicio)}
+                            disabled={!item.toRating}
+                            className={`flex items-center space-x-1 ${!item.toRating ?
+                              'text-gray-400 opacity-50 cursor-not-allowed' :
+                              'text-yellow-600 hover:text-yellow-900'} transition-colors`}
+                            title={!item.toRating ? "Este caso no requiere calificación" : "Calificar servicio"}
+                          >
+                            <FaStar className="w-4 h-4" />
+                            <span>Calificar</span>
+                          </button>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -218,16 +215,14 @@ const CaseUList = ({
             <button
               onClick={onPrevPage}
               disabled={currentPage === 1}
-              className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+              className={`relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
             >
               Anterior
             </button>
             <button
               onClick={onNextPage}
               disabled={currentPage === totalPages}
-              className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
+              className={`ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md ${currentPage === totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
             >
               Siguiente
             </button>
@@ -245,8 +240,7 @@ const CaseUList = ({
                 <button
                   onClick={onPrevPage}
                   disabled={currentPage === 1}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'
-                    }`}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                   <span className="sr-only">Anterior</span>
                   <FaChevronLeft className="h-5 w-5" aria-hidden="true" />
@@ -266,8 +260,7 @@ const CaseUList = ({
                 <button
                   onClick={onNextPage}
                   disabled={currentPage === totalPages}
-                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'
-                    }`}
+                  className={`relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'}`}
                 >
                   <span className="sr-only">Siguiente</span>
                   <FaChevronRight className="h-5 w-5" aria-hidden="true" />
@@ -292,19 +285,20 @@ const CaseUList = ({
       <SuccessDialog
         isOpen={showSuccessMessage}
         message="La calificación fue enviada correctamente."
-        caseNumber={selectedCaseNumber}
         onClose={() => setShowSuccessMessage(false)}
       />
 
       {selectedCaseNumber && (
         <CasePDF
           isOpen={showPdfModal}
-          onClose={() => setShowPdfModal(false)}
+          onClose={() => {
+            setTimeout(() => setShowPdfModal(false), 0);
+          }}
           caseNumber={selectedCaseNumber}
           typeCase={selectedCaseType === 'preventive' ? 'Preventivo' : 'Mantenimiento'}
         />
       )}
-    </>
+    </div>
   );
 };
 

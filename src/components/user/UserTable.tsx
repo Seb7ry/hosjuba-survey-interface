@@ -20,23 +20,23 @@ const UsersTable = ({ users, onEdit, onDelete }: UsersTableProps) => {
         <table className="w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Cargo</th>
+              <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {users.length > 0 ? (
               users.map((user) => (
                 <tr key={user.username} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.username}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.name}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.department}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{user.position}</td>
-                  <td className="px-6 py-4 text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-4">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900 text-center">{user.username}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 text-center">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 text-center">{user.department}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500 text-center">{user.position}</td>
+                  <td className="px-6 py-4 text-sm font-medium">
+                    <div className="flex justify-center space-x-4">
                       <button
                         onClick={() => onEdit(user)}
                         className="text-blue-600 hover:text-blue-900 transition-colors"
