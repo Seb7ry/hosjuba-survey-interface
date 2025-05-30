@@ -6,7 +6,7 @@ import { getUserByUsername } from '../../../services/user.service';
 import SignaturePadModal from '../../signature/SignatureModal';
 import ConfirmDialog from '../../ConfirmDialog';
 import CasePDF from '../CasePDF';
-import { ErrorMessage } from '../../ErrorMessage'; // Asegúrate de importar el componente ErrorMessage
+import { ErrorMessage } from '../../ErrorMessage';
 
 interface RatingModalProps {
     isOpen: boolean;
@@ -40,7 +40,7 @@ const CaseURating = ({
     const [showPdfModal, setShowPdfModal] = useState(false);
     const [, setIsLoadingPdf] = useState(false);
     const [, setPdfError] = useState<string | null>(null);
-    const [validationError, setValidationError] = useState<string | null>(null); // Nuevo estado para errores de validación
+    const [validationError, setValidationError] = useState<string | null>(null);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -89,7 +89,7 @@ const CaseURating = ({
             if (event.target?.result) {
                 const base64String = event.target.result as string;
                 setSignature(base64String);
-                setValidationError(null); // Limpiar error al subir firma
+                setValidationError(null);
             }
         };
         reader.onerror = () => setValidationError('Error al cargar la imagen');
@@ -99,7 +99,7 @@ const CaseURating = ({
     const handleSaveSignature = (signature: string) => {
         setSignature(signature);
         setIsSignatureModalOpen(false);
-        setValidationError(null); // Limpiar error al guardar firma
+        setValidationError(null);
     };
 
     const removeSignature = () => {
@@ -107,11 +107,18 @@ const CaseURating = ({
     };
 
     const validateForm = () => {
-        setValidationError(null); // Limpiar errores previos
+        setValidationError(null);
 
-        if (satisfaction === 0 || effectiveness === 0) {
-            setValidationError('Por favor califique ambos aspectos');
-            return false;
+        if (typeCase === 'corrective') {
+            if (satisfaction === 0 || effectiveness === 0) {
+                setValidationError('Por favor califique ambos aspectos');
+                return false;
+            }
+        } else {
+            if (satisfaction === 0) {
+                setValidationError('Por favor califique la satisfacción');
+                return false;
+            }
         }
 
         if (!signature) {
@@ -173,7 +180,6 @@ const CaseURating = ({
                     </div>
 
                     <div className="p-6 space-y-6">
-                        {/* Mostrar mensaje de error si existe */}
                         {validationError && (
                             <ErrorMessage
                                 message={validationError}
@@ -193,10 +199,9 @@ const CaseURating = ({
                                     </button>
                                 )}
                             </div>
-
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className={`grid ${typeCase === 'corrective' ? 'grid-cols-1 md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
                             <div className="space-y-3">
                                 <h3 className="text-sm font-medium text-gray-700 text-center">Satisfacción con el servicio</h3>
                                 {renderStars(
@@ -213,21 +218,23 @@ const CaseURating = ({
                                 </div>
                             </div>
 
-                            <div className="space-y-3">
-                                <h3 className="text-sm font-medium text-gray-700 text-center">Efectividad del servicio</h3>
-                                {renderStars(
-                                    effectiveness,
-                                    hoveredEffectiveness,
-                                    setEffectiveness,
-                                    setHoveredEffectiveness
-                                )}
-                                <div className="flex justify-between text-xs text-gray-500 px-2">
-                                    <span>Malo</span>
-                                    <span>Regular</span>
-                                    <span>Bueno</span>
-                                    <span>Excelente</span>
+                            {typeCase === 'corrective' && (
+                                <div className="space-y-3">
+                                    <h3 className="text-sm font-medium text-gray-700 text-center">Efectividad del servicio</h3>
+                                    {renderStars(
+                                        effectiveness,
+                                        hoveredEffectiveness,
+                                        setEffectiveness,
+                                        setHoveredEffectiveness
+                                    )}
+                                    <div className="flex justify-between text-xs text-gray-500 px-2">
+                                        <span>Malo</span>
+                                        <span>Regular</span>
+                                        <span>Bueno</span>
+                                        <span>Excelente</span>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
 
                         <div className="space-y-3">
