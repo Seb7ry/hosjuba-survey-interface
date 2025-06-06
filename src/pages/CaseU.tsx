@@ -77,9 +77,12 @@ const CaseU = () => {
             try {
                 setLoading(true);
 
-                const fetchedCases = await searchCases({
-                    reportedByName: userInfo.name
-                });
+                // Modificación aquí: Solo filtrar por reportedByName si NO es de sistemas
+                const searchParams = userInfo.department.toLowerCase() === 'sistemas'
+                    ? {}
+                    : { reportedByName: userInfo.name };
+
+                const fetchedCases = await searchCases(searchParams);
 
                 const filteredCases = fetchedCases
                     .filter((caseItem: any) =>
@@ -117,8 +120,9 @@ const CaseU = () => {
         if (userInfo.id) {
             loadCases();
         }
-    }, [debouncedSearchTerm, userInfo.id]);
+    }, [debouncedSearchTerm, userInfo.id, userInfo.department, userInfo.name]);
 
+    // Resto del código permanece igual...
     const handlePrevPage = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1);
@@ -147,7 +151,9 @@ const CaseU = () => {
 
     if (loading && cases.length === 0) {
         return (
-            <div className="flex min-h-screen bg-gray-50 relative">
+            <div className="flex min-h-screen bg-neutral-800 relative">
+
+
                 <div className="md:block md:w-64 flex-shrink-0">
                     <Sidebar />
                 </div>
@@ -171,9 +177,13 @@ const CaseU = () => {
 
                 <div className="p-4 sm:p-6 md:ml-6 md:mr-6 lg:ml-8 lg:mr-8">
                     <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
-                        <h1 className="text-3xl font-semibold text-gray-800">Mis Casos</h1>
+                        <h1 className="text-3xl font-semibold text-gray-800">
+                            {userInfo.department.toLowerCase() === 'sistemas' ? 'Todos los Casos' : 'Mis Casos'}
+                        </h1>
                         <div className="text-sm text-gray-600">
-                            Mostrando casos de {userInfo.name} ({userInfo.department})
+                            {userInfo.department.toLowerCase() === 'sistemas'
+                                ? 'Mostrando todos los casos (Sistemas)'
+                                : `Mostrando casos de ${userInfo.name} (${userInfo.department})`}
                         </div>
                     </div>
 

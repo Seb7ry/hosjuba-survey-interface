@@ -32,6 +32,7 @@ type EquipmentFormData = {
 type EquipmentFormModalProps = {
   isOpen: boolean;
   isEditing: boolean;
+  equipmentId?: string;
   formData: EquipmentFormData;
   onClose: () => void;
   onSubmit: (formData: EquipmentFormData) => Promise<void>;
@@ -274,6 +275,7 @@ const EquipmentModal = ({
   };
 
   if (!isOpen) return null;
+  if (!isOpen) return null;
 
   return (
     <>
@@ -293,15 +295,17 @@ const EquipmentModal = ({
           <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Nombre *</label>
-              <input
-                type="text"
-                name="name"
-                placeholder='Digite el nombre del Equipo'
-                value={formData.name}
-                onChange={onInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                required
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder='Digite el nombre del Equipo'
+                  value={formData.name}
+                  onChange={onInputChange}
+                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
             </div>
 
             <div>

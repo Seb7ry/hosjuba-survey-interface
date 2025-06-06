@@ -11,6 +11,7 @@ type SignatureFieldProps = {
   isRequired?: boolean;
   error?: string;
   onError?: (message: string) => void;
+  allowChangeWithoutRemove?: boolean;
 };
 
 export const SignatureField = ({
@@ -21,6 +22,7 @@ export const SignatureField = ({
   isRequired = false,
   error,
   onError,
+  allowChangeWithoutRemove = false,
 }: SignatureFieldProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -62,20 +64,41 @@ export const SignatureField = ({
             />
           </div>
           <div className="flex flex-wrap justify-center gap-2 w-full">
-            <button
-              type="button"
-              onClick={onDraw}
-              className="flex items-center justify-center px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
-            >
-              <Edit2 className="mr-1 h-3 w-3" /> Cambiar
-            </button>
-            <button
-              type="button"
-              onClick={onRemove}
-              className="flex items-center justify-center px-3 py-1 text-sm text-red-600 border border-red-600 rounded hover:bg-red-50"
-            >
-              <X className="mr-1 h-3 w-3" /> Eliminar
-            </button>
+            {allowChangeWithoutRemove ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center justify-center px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+                >
+                  <Upload className="mr-1 h-3 w-3" /> Cambiar imagen
+                </button>
+                <button
+                  type="button"
+                  onClick={onDraw}
+                  className="flex items-center justify-center px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+                >
+                  <Edit2 className="mr-1 h-3 w-3" /> Cambiar firma
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onDraw}
+                  className="flex items-center justify-center px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50"
+                >
+                  <Edit2 className="mr-1 h-3 w-3" /> Cambiar
+                </button>
+                <button
+                  type="button"
+                  onClick={onRemove}
+                  className="flex items-center justify-center px-3 py-1 text-sm text-red-600 border border-red-600 rounded hover:bg-red-50"
+                >
+                  <X className="mr-1 h-3 w-3" /> Eliminar
+                </button>
+              </>
+            )}
           </div>
         </div>
       ) : (

@@ -51,10 +51,10 @@ const CaseCards = ({
                     <div
                         key={item.id}
                         className={`bg-white p-4 rounded-lg shadow-sm border border-gray-100 ${item.toRating
-                                ? item.rated
-                                    ? ''
-                                    : 'bg-yellow-100'
-                                : ''
+                            ? item.rated
+                                ? ''
+                                : 'bg-yellow-100'
+                            : ''
                             }`}
                     >
                         <div className="flex justify-between items-start">

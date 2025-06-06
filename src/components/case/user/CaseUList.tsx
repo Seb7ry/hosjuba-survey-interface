@@ -40,6 +40,7 @@ const CaseUList = ({
   const [localCases, setLocalCases] = useState<Case[]>(cases);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showPdfModal, setShowPdfModal] = useState(false);
+  const [selectedCaseObservations, setSelectedCaseObservations] = useState('');
   const user = sessionStorage.getItem("username")?.toString();
   const username = user || "";
 
@@ -52,11 +53,17 @@ const CaseUList = ({
     return localCases.slice(startIndex, startIndex + itemsPerPage);
   };
 
-  const handleRateClick = (numero: string, tipoServicio: string) => {
-    setSelectedCaseNumber(numero);
-    const typeCase = tipoServicio.toLowerCase().includes('preventivo') ? 'preventive' : 'corrective';
-    setSelectedCaseType(typeCase);
-    setRatingModalOpen(true);
+  const handleRateClick = async (numero: string, tipoServicio: string) => {
+    try {
+      const caseData = await getCaseByNumber(numero);
+      setSelectedCaseObservations(caseData.observations || '');
+      setSelectedCaseNumber(numero);
+      const typeCase = tipoServicio.toLowerCase().includes('preventivo') ? 'preventive' : 'corrective';
+      setSelectedCaseType(typeCase);
+      setRatingModalOpen(true);
+    } catch (error) {
+      console.error('Error al cargar el caso:', error);
+    }
   };
 
   const handleViewDocument = (numero: string, tipoServicio: string) => {
@@ -66,7 +73,11 @@ const CaseUList = ({
     setShowPdfModal(true);
   };
 
-  const handleSubmitRating = async (ratings: { satisfaction: number; effectiveness: number }, signature: string) => {
+  const handleSubmitRating = async (
+    ratings: { satisfaction: number; effectiveness: number },
+    signature: string,
+    observations?: string
+  ) => {
     try {
       setIsSubmitting(true);
 
@@ -79,11 +90,12 @@ const CaseUList = ({
 
       const updateData = {
         satisfactionRating: { value: ratings.satisfaction },
-        effectivenessRating: { value: ratings.effectiveness },
+        effectivenessRating: selectedCaseType === 'corrective' ? { value: ratings.effectiveness } : undefined,
         reportedBy: {
           ...caseToUpdate.reportedBy,
           signature: signature
         },
+        observations: observations,
         rated: true,
         status: 'Cerrado',
       };
@@ -91,7 +103,11 @@ const CaseUList = ({
       const updatedCase = await updateCase(selectedCaseNumber, updateData);
 
       setLocalCases(prevCases =>
-        prevCases.map(c => c.numero === selectedCaseNumber ? { ...c, ...updateData } : c)
+        prevCases.map(c => c.numero === selectedCaseNumber ? {
+          ...c,
+          rated: true,
+          estado: 'Cerrado'
+        } : c)
       );
 
       onCaseUpdate({
@@ -112,7 +128,6 @@ const CaseUList = ({
       setShowSuccessMessage(true);
     } catch (error) {
       console.error('Error al calificar el caso:', error);
-      alert('Error al enviar la calificación. Por favor intente nuevamente.');
     } finally {
       setIsSubmitting(false);
     }
@@ -142,7 +157,7 @@ const CaseUList = ({
                     className={`hover:bg-gray-50 transition-colors text-sm text-gray-700`}
                   >
                     <td className="px-6 py-4 font-medium text-center">{item.numero}</td>
-                    <td className="px-6 py-4 text-center">{item.tipoServicio}</td>
+                    <td className="px-6 py-4 text-center"> {item.tipoServicio === 'Mantenimiento' ? 'Correctivo' : 'Preventivo'}</td>
                     <td className="px-6 py-4 text-center">{item.tecnico}</td>
                     <td className="px-6 py-4 text-center">{item.dependencia}</td>
                     <td className="px-6 py-4 text-center">
@@ -279,6 +294,7 @@ const CaseUList = ({
         username={username}
         caseNumber={selectedCaseNumber}
         typeCase={selectedCaseType}
+        initialObservations={selectedCaseObservations}
         onSuccess={() => setShowSuccessMessage(true)}
       />
 

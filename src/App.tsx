@@ -15,6 +15,7 @@ import Report from "./pages/Report";
 import Deleted from "./components/case/Deleted";
 import CaseU from "./pages/CaseU";
 import DepartmentRoute from "./components/DepartmentRoute";
+import History from "./pages/History";
 
 if (typeof window !== 'undefined' && document.getElementById('root')) {
   Modal.setAppElement('#root');
@@ -52,6 +53,7 @@ function App() {
             <Route path="/preventive" element={<Preventive />} />
             <Route path="/preventive/new" element={<CaseForm isPreventive={true} />} />
             <Route path="/preventive/edit/:numberCase" element={<CaseForm isPreventive={true} />} />
+            <Route path="/history" element={<History />} />
           </Route>
         </Route>
       </Routes>

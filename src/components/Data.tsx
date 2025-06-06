@@ -38,6 +38,7 @@ export const useFormCorrective = () => {
             level: "",
             diagnosis: "",
             solution: "",
+            isEscalated: false,
             requiresEscalation: false,
             escalationTechnician: {
                 _id: "",

@@ -41,11 +41,11 @@ const CaseUCard = ({ item, onRateClick, onViewDocument, isRatingDisabled }: Case
         </div>
       </div>
 
-      <div className="flex justify-center w-full"> {/* Añadido w-full aquí */}
+      <div className="flex justify-center w-full">
         {item.rated || item.estado === 'Cerrado' ? (
           <button
             onClick={() => onViewDocument(item.numero, item.tipoServicio)}
-            className="flex items-center justify-center space-x-2 py-2 px-4 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md text-sm font-medium transition-colors w-full" // Añadido w-full aquí
+            className="flex items-center justify-center space-x-2 py-2 px-4 border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-md text-sm font-medium transition-colors w-full"
             title="Ver documento del servicio"
           >
             <FaEye className="w-4 h-4" />
@@ -55,7 +55,7 @@ const CaseUCard = ({ item, onRateClick, onViewDocument, isRatingDisabled }: Case
           <button
             onClick={() => onRateClick(item.numero)}
             disabled={isRatingDisabled}
-            className={`flex items-center justify-center space-x-2 py-2 px-4 border rounded-md text-sm font-medium transition-colors w-full ${isRatingDisabled // Añadido w-full aquí
+            className={`flex items-center justify-center space-x-2 py-2 px-4 border rounded-md text-sm font-medium transition-colors w-full ${isRatingDisabled
               ? 'border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed'
               : 'border-yellow-200 bg-yellow-50 text-yellow-700 hover:bg-yellow-100'
               }`}

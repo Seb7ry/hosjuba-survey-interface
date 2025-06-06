@@ -58,20 +58,18 @@ export const createEquipment = async (equipmentData: EquipmentData): Promise<Equ
     }
 };
 
-export const updateEquipment = async (name: string, updateData: Partial<EquipmentData>): Promise<EquipmentResponse> => {
+export const updateEquipment = async (id: string, updateData: Partial<EquipmentData>): Promise<EquipmentResponse> => {
     try {
-        const response = await axios.put(`${API_URL}/equipment/${name}`, {
-            ...updateData
-        }, headers());
+        const response = await axios.put(`${API_URL}/equipment/${id}`, updateData, headers());
         return response.data;
     } catch (error: any) {
         throw new Error(error.response?.data?.message || 'Error al actualizar el equipo.');
     }
 };
 
-export const deleteEquipment = async (name: string): Promise<void> => {
+export const deleteEquipment = async (id: string): Promise<void> => {
     try {
-        await axios.delete(`${API_URL}/equipment/${name}`, headers());
+        await axios.delete(`${API_URL}/equipment/${id}`, headers());
     } catch (error: any) {
         throw new Error(error.response?.data?.message || 'Error al eliminar el equipo.');
     }

@@ -33,7 +33,8 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
     const loadCase = async () => {
       if (isEditMode && numberCase) {
         try {
-          const caseData = await getCaseByNumber(numberCase);
+          const caseData = await getCaseByNumber(numberCase, isPreventive ? 'Preventivo' : 'Mantenimiento');
+
           setFormData(caseData);
         } catch (err) {
           console.error("Error al cargar el caso:", err);
@@ -120,7 +121,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
       let shouldCreateEscalation = false;
 
       if (isEditMode && numberCase) {
-        const originalCase = await getCaseByNumber(numberCase);
+        const originalCase = await getCaseByNumber(numberCase, isPreventive ? 'Preventivo' : 'Mantenimiento');
         updatedOrCreatedCase = await updateCase(numberCase, caseDataWithType);
 
         if (!isPreventive) {
@@ -179,6 +180,7 @@ const CaseForm = ({ isPreventive }: FormContainerProps) => {
           },
           serviceData: {
             ...currentServiceData,
+            isEscalated: true,
             level: currentServiceData.escalationTechnician.level,
             requiresEscalation: false,
             escalationTechnician: {

@@ -21,11 +21,15 @@ export const createCase = async (caseData: any) => {
     return response.data;
 };
 
-export const getCaseByNumber = async (caseNumber: any) => {
-    const response = await axios.get(`${API_URL}/case/${caseNumber}`, headers());
+export const getCaseByNumber = async (caseNumber: string, typeCase: 'Preventivo' | 'Mantenimiento') => {
+    const response = await axios.get(`${API_URL}/case/${caseNumber}`, {
+        ...headers(),
+        params: { typeCase }
+    });
     await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
 };
+
 
 export const searchCases = async (filters: any) => {
     try {
@@ -54,8 +58,11 @@ export const updateCase = async (id: any, updateData: any) => {
     return response.data;
 };
 
-export const deleteCase = async (id: any) => {
-    const response = await axios.delete(`${API_URL}/case/${id}`, headers());
+export const deleteCase = async (caseNumber: string, typeCase: 'Mantenimiento' | 'Preventivo') => {
+    const response = await axios.delete(`${API_URL}/case/${caseNumber}`, {
+        ...headers(),
+        data: { typeCase }
+    });
     await refreshSession(sessionStorage.getItem('username') || '');
     return response.data;
 };

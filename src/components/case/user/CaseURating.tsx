@@ -11,12 +11,13 @@ import { ErrorMessage } from '../../ErrorMessage';
 interface RatingModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (ratings: { satisfaction: number; effectiveness: number }, signature: string) => void;
+    onSubmit: (ratings: { satisfaction: number; effectiveness: number }, signature: string, observations?: string) => void;
     isSubmitting?: boolean;
     username: string;
     onSuccess?: () => void;
     caseNumber?: string;
     typeCase?: 'preventive' | 'corrective';
+    initialObservations?: string;
 }
 
 const CaseURating = ({
@@ -27,11 +28,13 @@ const CaseURating = ({
     username,
     onSuccess,
     caseNumber,
-    typeCase
+    typeCase,
+    initialObservations = ''
 }: RatingModalProps) => {
     const [satisfaction, setSatisfaction] = useState(0);
     const [effectiveness, setEffectiveness] = useState(0);
     const [signature, setSignature] = useState('');
+    const [observations, setObservations] = useState(initialObservations);
     const [hoveredSatisfaction, setHoveredSatisfaction] = useState(0);
     const [hoveredEffectiveness, setHoveredEffectiveness] = useState(0);
     const [isSignatureModalOpen, setIsSignatureModalOpen] = useState(false);
@@ -41,9 +44,15 @@ const CaseURating = ({
     const [, setIsLoadingPdf] = useState(false);
     const [, setPdfError] = useState<string | null>(null);
     const [validationError, setValidationError] = useState<string | null>(null);
+    const [isSystemsUser, setIsSystemsUser] = useState(false);
 
     useEffect(() => {
         if (!isOpen) return;
+        setObservations(initialObservations);
+
+        // Verificar si el usuario es del departamento de Sistemas
+        const department = sessionStorage.getItem('department');
+        setIsSystemsUser(department === 'Sistemas');
 
         const fetchData = async () => {
             try {
@@ -56,7 +65,7 @@ const CaseURating = ({
         };
 
         fetchData();
-    }, [isOpen, username]);
+    }, [isOpen, username, initialObservations]);
 
     const handleViewDocument = async () => {
         if (!caseNumber || !typeCase) return;
@@ -138,7 +147,7 @@ const CaseURating = ({
         setShowConfirmDialog(false);
 
         try {
-            await onSubmit({ satisfaction, effectiveness }, signature);
+            await onSubmit({ satisfaction, effectiveness }, signature, observations);
             setShowSuccessDialog(false);
             onSuccess?.();
         } catch (error) {
@@ -170,8 +179,8 @@ const CaseURating = ({
 
     return (
         <>
-            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 overflow-hidden">
+                <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto relative">
                     <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-semibold text-gray-800">Calificar Servicio</h2>
                         <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -238,6 +247,17 @@ const CaseURating = ({
                         </div>
 
                         <div className="space-y-3">
+                            <h3 className="text-sm font-medium text-gray-700">Observaciones (Opcional)</h3>
+                            <textarea
+                                value={observations}
+                                onChange={(e) => setObservations(e.target.value)}
+                                placeholder="Agregue cualquier comentario adicional sobre el servicio..."
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="space-y-3">
                             <h3 className="text-sm font-medium text-gray-700">Firma de confirmación</h3>
                             <p className="text-xs text-gray-500">Por favor dibuje o suba su firma para confirmar la calificación</p>
                             <SignatureField
@@ -247,6 +267,7 @@ const CaseURating = ({
                                 onChange={setSignature}
                                 onRemove={removeSignature}
                                 isRequired={true}
+                                allowChangeWithoutRemove={isSystemsUser}
                             />
                         </div>
 

@@ -14,6 +14,7 @@ export type Case = {
     id: string;
     numero: string;
     dependencia: string;
+    isEscalated: boolean;
     estado: string;
     fechaReporte: string;
     funcionario: string;
@@ -52,7 +53,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-    const [caseToDelete, setCaseToDelete] = useState<string | null>(null);
+    const [caseToDelete, setCaseToDelete] = useState<{ number: string; type: 'Preventivo' | 'Mantenimiento' } | null>(null);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showError, setShowError] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -99,6 +100,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
             const mappedCases = response.map((item: any) => ({
                 id: item._id,
                 numero: item.caseNumber || 'Fallo',
+                isEscalated: item.serviceData?.isEscalated || false,
                 dependencia: item.dependency || "Sin especificar",
                 estado: item.status || "Pendiente",
                 fechaReporte: item.reportedAt || item.createdAt,
@@ -144,8 +146,8 @@ const CaseList = ({ typeCase }: CaseListProps) => {
         }
     };
 
-    const handleDeleteClick = (caseId: string) => {
-        setCaseToDelete(caseId);
+    const handleDeleteClick = (caseNumber: string) => {
+        setCaseToDelete({ number: caseNumber, type: typeCase });
         setShowSuccess(false);
         setShowConfirmDialog(true);
     };
@@ -155,7 +157,8 @@ const CaseList = ({ typeCase }: CaseListProps) => {
 
         try {
             setIsDeleting(true);
-            await deleteCase(caseToDelete);
+            if (!caseToDelete) return;
+            await deleteCase(caseToDelete.number, caseToDelete.type);
             await loadCases();
             setShowSuccess(true);
         } catch (err) {
@@ -220,6 +223,7 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 text-gray-600 text-sm">
+                                {hasPriority && <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Esc.</th>}
                                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">N° Caso</th>
                                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Técnico</th>
                                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Dependencia</th>
@@ -235,12 +239,17 @@ const CaseList = ({ typeCase }: CaseListProps) => {
                                     <tr
                                         key={item.id}
                                         className={`hover:bg-gray-50 transition-colors text-sm text-gray-700 ${item.toRating
-                                                ? item.rated
-                                                    ? ''
-                                                    : 'bg-yellow-100'
-                                                : ''
+                                            ? item.rated
+                                                ? ''
+                                                : 'bg-yellow-100'
+                                            : ''
                                             }`}
                                     >
+                                        {hasPriority && (
+                                            <td className="px-6 py-4 text-center">
+                                                {item.isEscalated ? 'SI' : 'NO'}
+                                            </td>
+                                        )}
                                         <td className="px-6 py-4 font-medium text-center">{item.numero}</td>
                                         <td className="px-6 py-4 text-center">{item.tecnico}</td>
                                         <td className="px-6 py-4 text-center">{item.dependencia}</td>

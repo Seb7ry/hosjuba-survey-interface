@@ -8,7 +8,7 @@ import EquipmentCards from '../components/equipment/EquipmentCard';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { ErrorMessage } from '../components/ErrorMessage';
 
-type Equipment = EquipmentResponse;
+type Equipment = EquipmentResponse & { id: string };
 
 const Equipment = () => {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
@@ -20,6 +20,7 @@ const Equipment = () => {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false);
   const [equipmentToDelete, setEquipmentToDelete] = useState<Equipment | null>(null);
+  const [currentEquipmentId, setCurrentEquipmentId] = useState<string | null>(null);
   const [formData, setFormData] = useState<EquipmentData>({
     name: '',
     brand: '',
@@ -41,7 +42,7 @@ const Equipment = () => {
     const fetchEquipments = async () => {
       try {
         const data = await getAllEquipment();
-        setEquipments(data);
+        setEquipments(data.map((e) => ({ ...e, id: e._id || '' })));
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -78,18 +79,19 @@ const Equipment = () => {
       numberInventory: ''
     });
     setIsEditing(false);
+    setCurrentEquipmentId(null);
     setModalOpen(false);
   };
 
   const handleSubmit = async (formData: EquipmentData) => {
     try {
-      if (isEditing) {
-        await updateEquipment(formData.name, formData);
+      if (isEditing && currentEquipmentId) {
+        await updateEquipment(currentEquipmentId, formData);
       } else {
         await createEquipment(formData);
       }
       const data = await getAllEquipment();
-      setEquipments(data);
+      setEquipments(data.map((e) => ({ ...e, id: e._id || '' })));
       resetForm();
     } catch (err: any) {
       throw err;
@@ -106,12 +108,13 @@ const Equipment = () => {
       serial: equipment.serial,
       numberInventory: equipment.numberInventory
     });
+    setCurrentEquipmentId(equipment._id!);
     setIsEditing(true);
     setModalOpen(true);
   };
 
-  const handleDeleteInit = (name: string) => {
-    const equipment = equipments.find(e => e.name === name);
+  const handleDeleteInit = (id: string) => {
+    const equipment = equipments.find(e => e._id === id);
     if (equipment) {
       setEquipmentToDelete(equipment);
       setIsConfirmingDelete(true);
@@ -122,9 +125,9 @@ const Equipment = () => {
     if (!equipmentToDelete) return;
 
     try {
-      await deleteEquipment(equipmentToDelete.name);
+      await deleteEquipment(equipmentToDelete._id!);
       const data = await getAllEquipment();
-      setEquipments(data);
+      setEquipments(data.map((e) => ({ ...e, id: e._id || '' })));
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -195,6 +198,7 @@ const Equipment = () => {
         <EquipmentFormModal
           isOpen={modalOpen}
           isEditing={isEditing}
+          equipmentId={currentEquipmentId || undefined}
           formData={formData}
           onClose={resetForm}
           onSubmit={handleSubmit}
