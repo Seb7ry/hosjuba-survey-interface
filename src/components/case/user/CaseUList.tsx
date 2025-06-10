@@ -55,7 +55,7 @@ const CaseUList = ({
 
   const handleRateClick = async (numero: string, tipoServicio: string) => {
     try {
-      const caseData = await getCaseByNumber(numero);
+      const caseData = await getCaseByNumber(numero, tipoServicio.toLowerCase().includes('preventivo') ? 'Preventivo' : 'Mantenimiento');
       setSelectedCaseObservations(caseData.observations || '');
       setSelectedCaseNumber(numero);
       const typeCase = tipoServicio.toLowerCase().includes('preventivo') ? 'preventive' : 'corrective';
@@ -81,7 +81,11 @@ const CaseUList = ({
     try {
       setIsSubmitting(true);
 
-      const caseToUpdate = await getCaseByNumber(selectedCaseNumber);
+      const caseToUpdate = await getCaseByNumber(
+        selectedCaseNumber,
+        selectedCaseType === 'preventive' ? 'Preventivo' : 'Mantenimiento'
+      );
+
 
       if (!caseToUpdate) {
         console.error('Caso no encontrado');
