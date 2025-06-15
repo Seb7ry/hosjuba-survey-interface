@@ -151,8 +151,8 @@ const CaseU = () => {
 
     if (loading && cases.length === 0) {
         return (
-            <div className="flex min-h-screen bg-neutral-800 relative">
-
+            <div className="flex min-h-screen bg-gray-50 relative">
+g
 
                 <div className="md:block md:w-64 flex-shrink-0">
                     <Sidebar />
