@@ -200,6 +200,18 @@ const Login = () => {
             </div>
           </form>
 
+          <div className="mt-6 bg-blue-50 border border-blue-200 p-4 rounded-md shadow-sm">
+            <h3 className="text-center text-sm font-bold text-blue-900 mb-2">
+              Credenciales de prueba
+            </h3>
+            <p className="text-sm text-gray-700 text-center">
+              <strong>Usuario:</strong> ADMIN
+            </p>
+            <p className="text-sm text-gray-700 text-center">
+              <strong>Contraseña:</strong> 1234
+            </p>
+          </div>
+
           <div className="text-center text-sm text-gray-500">
             ¿Deseas más información de este servicio?{" "}
             <button
