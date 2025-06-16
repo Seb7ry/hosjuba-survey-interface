@@ -28,7 +28,7 @@ function App() {
   const accessToken = sessionStorage.getItem("access_token");
 
   useEffect(() => {
-    if (accessToken && window.location.pathname === "#/") {
+    if (accessToken && window.location.hash === "#/") {
       navigate("/dashboard");
     }
   }, [accessToken, navigate]);
